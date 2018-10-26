@@ -1,0 +1,3 @@
+install anaconda python
+install package selenium
+download chromedriver; look at which chrome version it supports
