@@ -43,12 +43,29 @@ class ChromeDriver:
         self.driver.close()
 
 if __name__ == '__main__':
+    import os
+    import os.path
+    root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
+    temp_dir = os.path.join(root_dir, 'temp')
+    if not os.path.exists(temp_dir):
+        os.makedirs(temp_dir)
+    log_file = os.path.join(temp_dir, 'webpage.log')
     import sys
-    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+    logging.basicConfig(level=logging.INFO, filename=log_file, filemode='w')
+    logging.getLogger().addHandler(logging.StreamHandler())
+    # create chrome driver
     chrome_driver = ChromeDriver(height=3240)
-    url = 'https://finance.yahoo.com/quote/MSFT/options?date=1542326400';
+    # option chain
+    url = 'https://finance.yahoo.com/quote/MSFT/options?date=1542326400'
     eid = 'Col1-1-OptionContracts-Proxy'
-    data = chrome_driver.download_data(url=url, element_id=eid)
+    outfile = os.path.join(temp_dir, 'data_msft_option_chain.txt')
+    data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
+    print (data)
+    # option activity
+    url = 'https://www.barchart.com/options/unusual-activity/stocks?orderBy=tradeTime&orderDir=desc&page=1'
+    eid = 'main-content-column'
+    outfile = os.path.join(temp_dir, 'data_option_activity.txt')
+    data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
     print (data)
     chrome_driver.close()
 
