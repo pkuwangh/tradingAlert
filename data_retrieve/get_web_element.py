@@ -1,4 +1,4 @@
-#!/home/wangh/anaconda3/bin/python
+#!/usr/bin/env python
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     temp_dir = os.path.join(root_dir, 'temp')
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
-    log_file = os.path.join(temp_dir, 'webpage.log')
+    log_file = os.path.join(temp_dir, 'log.' + __name__)
     import sys
     logging.basicConfig(level=logging.INFO, filename=log_file, filemode='w')
     logging.getLogger().addHandler(logging.StreamHandler())
