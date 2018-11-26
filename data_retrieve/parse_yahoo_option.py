@@ -41,11 +41,12 @@ def scan_option_chain(symbol, exp_date, option_type, strike, option_chain):
 
 def parse_option_info(symbol, exp_date, option_type, strike, infile):
     try:
+        logger.info('lookup file %s for %s exp=%s %s at % .1f'
+                % (infile, symbol, get_date_str(exp_date), option_type, strike))
         fin = open(infile, 'r')
     except:
-        logger.debug('error reading %s' % (infile))
+        logger.info('error reading %s' % (infile))
         return (False, 0)
-    print ('check')
     option_chain = fin.readlines()
     (contract_name, found, open_interest) = \
             scan_option_chain(symbol, exp_date, option_type, strike, option_chain)
@@ -73,6 +74,7 @@ def lookup_option_info(symbol, exp_date, option_type, strike, save_file=False):
         filename = os.path.join(meta_data_dir, contract_name + '_' + today_date_str + '.txt')
         with open(filename, 'w') as fout:
             fout.write(web_data)
+        logger.info('save %s option chain to %s' % (symbol, filename))
     return (found, open_interest)
 
 if __name__ == '__main__':
@@ -81,12 +83,12 @@ if __name__ == '__main__':
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
-    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='w')
+    logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
-    exp_date = datetime.datetime(2018,11,16)
-    #(found, open_interest) = lookup_option_info('MSFT', exp_date, 'C', 70, True)
-    #print ('open interest is %d' % (open_interest))
-    infile = os.path.join(root_dir, 'temp', 'data_msft_option_chain.txt')
-    (found, open_interest) = parse_option_info('MSFT', exp_date, 'C', 70, infile)
+#    exp_date = datetime.datetime(2018,11,16)
+#    infile = os.path.join(root_dir, 'temp', 'data_msft_option_chain.txt')
+#    (found, open_interest) = parse_option_info('MSFT', exp_date, 'C', 70, infile)
+    exp_date = datetime.datetime(2018,12,28)
+    (found, open_interest) = lookup_option_info('MSFT', exp_date, 'P', 100, True)
     print ('open interest is %d' % (open_interest))
 
