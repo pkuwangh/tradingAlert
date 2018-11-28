@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import datetime
 import logging
 from math import floor
@@ -8,8 +9,9 @@ logger = logging.getLogger(__name__)
 
 from get_web_element import ChromeDriver
 
-def get_time_str(date_and_time):
-    return date_and_time.strftime('%y%m%d_%H%M%S')
+root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
+sys.path.append(root_dir)
+from util.datetime_string import *
 
 def scan_option_activity(raw_data):
     option_activity_list = []
@@ -74,7 +76,7 @@ def get_option_activity(save_file=False):
         meta_data_dir = os.path.join(root_dir, 'logs')
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
-        today_time_str = get_time_str(datetime.datetime.now())
+        today_time_str = get_datetime_str(datetime.datetime.now())
         filename = os.path.join(meta_data_dir, 'OA_%s.txt' % (today_time_str))
         with open(filename, 'w') as fout:
             fout.write('\n'.join(option_activity_list))
@@ -82,7 +84,6 @@ def get_option_activity(save_file=False):
     return (option_activity_list, num_pages)
 
 if __name__ == '__main__':
-    root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
     meta_data_dir = os.path.join(root_dir, 'logs')
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
@@ -90,9 +91,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
     # test from local copy
-#    infile = os.path.join(root_dir, 'temp', 'data_option_activity.txt')
-#    (option_activity_list, num_pages) = parse_option_activity(infile)
-#    print ('\n'.join(option_activity_list))
+    infile = os.path.join(root_dir, 'temp', 'data_option_activity.txt')
+    (option_activity_list, num_pages) = parse_option_activity(infile)
+    print ('\n'.join(option_activity_list))
     # test from lookup
-    (option_activity_list, num_pages) = get_option_activity(save_file=True)
+    #(option_activity_list, num_pages) = get_option_activity(save_file=True)
 
