@@ -27,22 +27,23 @@ def scan_option_chain(symbol, exp_date, option_type, strike, option_chain):
     exp_date_str = get_date_str(exp_date)
     strike_str = '%08d' % (strike * 1000)
     contract_name = symbol + exp_date_str + option_type + strike_str
-    logger.info('lookup %s exp=%s %s at %.1f'
-            % (symbol, exp_date_str, option_type, strike))
+    logger.info('%s lookup %s exp=%s %s at %.1f'
+            % (get_time_log(), symbol, exp_date_str, option_type, strike))
     for contract in option_chain:
         if contract.startswith(contract_name):
             open_interest = extract_contract_info(contract)
-            logger.info('got OI=%d from {%s}' % (open_interest, contract.rstrip()))
+            logger.info('%s got OI=%d from {%s}'
+                    % (get_time_log(), open_interest, contract.rstrip()))
             break
     return (contract_name, open_interest >= 0, open_interest)
 
 def parse_option_info(symbol, exp_date, option_type, strike, infile):
     try:
-        logger.info('lookup file %s for %s exp=%s %s at % .1f'
-                % (infile, symbol, get_date_str(exp_date), option_type, strike))
+        logger.info('%s lookup file %s for %s exp=%s %s at % .1f'
+                % (get_time_log(), infile, symbol, get_date_str(exp_date), option_type, strike))
         fin = open(infile, 'r')
     except:
-        logger.info('error reading %s' % (infile))
+        logger.info('%s error reading %s' % (get_time_log(), infile))
         return (False, 0)
     option_chain = fin.readlines()
     (contract_name, found, open_interest) = \
@@ -71,7 +72,7 @@ def lookup_option_info(symbol, exp_date, option_type, strike, save_file=False):
         filename = os.path.join(meta_data_dir, contract_name + '_' + today_date_str + '.txt')
         with open(filename, 'w') as fout:
             fout.write(web_data)
-        logger.info('save %s option chain to %s' % (symbol, filename))
+        logger.info('%s save %s option chain to %s' % (get_time_log(), symbol, filename))
     return (found, open_interest)
 
 if __name__ == '__main__':

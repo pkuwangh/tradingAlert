@@ -3,9 +3,14 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-from datetime import datetime
+import os
+import sys
 import logging
 logger = logging.getLogger(__name__)
+
+root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
+sys.path.append(root_dir)
+from util.datetime_string import *
 
 class ChromeDriver:
     # class members
@@ -22,7 +27,7 @@ class ChromeDriver:
 
     def download_data(self, url, element_id=None, class_name=None, outfile=None):
         logger.info('%s download data from %s'
-                % (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), url))
+                % (get_time_log(), url))
         # access the url
         self.driver.get(url)
         # get the target element

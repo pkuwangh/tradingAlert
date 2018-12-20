@@ -18,7 +18,6 @@ def scan_option_activity(raw_data):
     num_pages = 0
     main_table_started = False
     new_activity = ''
-    item_count = 0
     for line in raw_data:
         line = line.rstrip()
         if 'Showing 1-100' in line:
@@ -28,13 +27,12 @@ def scan_option_activity(raw_data):
             if 'Last Volume Open Int' in line:
                 main_table_started = False
             else:
+                if line.isupper():
+                    # assume all upper case is symbol
+                    if new_activity:
+                        option_activity_list.append(new_activity)
+                        new_activity = ''
                 new_activity += (' ' + line)
-                item_count += 1
-                # TODO: make this robust with format changes
-                if item_count == 15:
-                    option_activity_list.append(new_activity)
-                    new_activity = ''
-                    item_count = 0
         else:
             if 'Last Volume Open Int' in line:
                 main_table_started = True 
@@ -42,10 +40,10 @@ def scan_option_activity(raw_data):
 
 def parse_option_activity(infile):
     try:
-        logger.info('lookup file %s to parse option activity' % (infile))
+        logger.info('%s lookup file %s to parse option activity' % (get_time_log(), infile))
         fin = open(infile, 'r')
     except:
-        logger.info('error reading %s' % (infile))
+        logger.info('%s error reading %s' % (get_time_log(), infile))
         return ([''], 0)
     (option_activity_list, num_pages) = scan_option_activity(fin.readlines())
     return (option_activity_list, num_pages)
@@ -80,7 +78,7 @@ def get_option_activity(save_file=False):
         filename = os.path.join(meta_data_dir, 'OA_%s.txt' % (today_time_str))
         with open(filename, 'w') as fout:
             fout.write('\n'.join(option_activity_list))
-        logger.info('save option activity to %s' % (filename))
+        logger.info('%s save option activity to %s' % (get_time_log(), filename))
     return (option_activity_list, num_pages)
 
 if __name__ == '__main__':
