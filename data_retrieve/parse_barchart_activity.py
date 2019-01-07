@@ -7,11 +7,10 @@ import logging
 from math import floor
 logger = logging.getLogger(__name__)
 
-from get_web_element import ChromeDriver
-
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
 from util.datetime_string import *
+from data_retrieve.get_web_element import ChromeDriver
 
 def scan_option_activity(raw_data):
     option_activity_list = []
@@ -43,7 +42,7 @@ def parse_option_activity(infile):
         logger.info('%s lookup file %s to parse option activity' % (get_time_log(), infile))
         fin = open(infile, 'r')
     except:
-        logger.info('%s error reading %s' % (get_time_log(), infile))
+        logger.error('%s error reading %s' % (get_time_log(), infile))
         return ([''], 0)
     (option_activity_list, num_pages) = scan_option_activity(fin.readlines())
     return (option_activity_list, num_pages)

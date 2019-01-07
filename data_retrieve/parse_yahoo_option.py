@@ -6,11 +6,10 @@ import datetime
 import logging
 logger = logging.getLogger(__name__)
 
-from get_web_element import ChromeDriver
-
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
 from util.datetime_string import *
+from data_retrieve.get_web_element import ChromeDriver
 
 def get_date_in_url(exp_date):
     # convert a datetime object into the special date string used in url
@@ -43,7 +42,7 @@ def parse_option_info(symbol, exp_date, option_type, strike, infile):
                 % (get_time_log(), infile, symbol, get_date_str(exp_date), option_type, strike))
         fin = open(infile, 'r')
     except:
-        logger.info('%s error reading %s' % (get_time_log(), infile))
+        logger.error('%s error reading %s' % (get_time_log(), infile))
         return (False, 0)
     option_chain = fin.readlines()
     (contract_name, found, open_interest) = \
