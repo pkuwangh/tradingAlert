@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options
 
 import os
 import sys
+import time
 import logging
 logger = logging.getLogger(__name__)
 
@@ -22,27 +23,62 @@ class ChromeDriver:
         self.chrome_options.add_argument('--headless')
         self.chrome_options.add_argument('--window-size=1920,3240')
         self.chrome_options.binary_location = ChromeDriver.binary_path
-        self.driver = webdriver.Chrome(executable_path=ChromeDriver.driver_path,
-                                       options=self.chrome_options)
+        num_retry = 0
+        while num_retry < 3:
+            try:
+                self.driver = webdriver.Chrome(executable_path=ChromeDriver.driver_path,
+                        options=self.chrome_options)
+                break
+            except Exception as e:
+                logger.error('error when init driver: %s' % (e))
+                time.sleep(10)
+                num_retry += 1
+                continue
+            if num_retry >= 3:
+                raise
 
     def download_data(self, url, element_id=None, class_name=None, outfile=None):
         logger.info('%s download data from %s'
                 % (get_time_log(), url))
-        # access the url
-        self.driver.get(url)
-        # get the target element
-        if element_id:
-            element = self.driver.find_element_by_id(element_id)
-        elif class_name:
-            element = self.driver.find_element_by_class_name(class_name)
-        else:
-            logger.error('Do not know how to find element')
-            raise
+        num_retry = 0
+        element = None
+        while num_retry < 3:
+            num_retry += 1
+            # access the url
+            try:
+                self.driver.get(url)
+            except Exception as e:
+                logger.error('error when accessing url=%s: %s'
+                        % (url, e))
+                time.sleep(10)
+                continue
+            # get the target element
+            if element_id:
+                try:
+                    element = self.driver.find_element_by_id(element_id)
+                except Exception as e:
+                    logger.error('error when getting element=%s: %s'
+                            % (element_id, e))
+                    continue
+            elif class_name:
+                try:
+                    element = self.driver.find_element_by_class_name(class_name)
+                except Exception as e:
+                    logger.error('error when getting class=%s: %s'
+                            % (class_name, e))
+                    continue
+            else:
+                logger.error('Do not know how to find element')
+            # done if found element
+            if element:
+                break
         # output & return
-        if outfile:
-            with open(outfile, 'w') as fout:
-                fout.write(element.text)
-        return element.text
+        if element:
+            if outfile:
+                with open(outfile, 'w') as fout:
+                    fout.write(element.text)
+            return element.text
+        return ''
 
     def close(self):
         self.driver.close()
@@ -51,7 +87,7 @@ if __name__ == '__main__':
     import os
     import os.path
     root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
-    temp_dir = os.path.join(root_dir, 'temp')
+    temp_dir = os.path.join(root_dir, 'logs')
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
     log_file = os.path.join(temp_dir, 'log.' + __name__)

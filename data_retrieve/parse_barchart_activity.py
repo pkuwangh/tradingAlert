@@ -17,7 +17,7 @@ def scan_option_activity(raw_data):
     num_pages = 0
     main_table_started = False
     new_activity = ''
-    for line in raw_data:
+    for idx,line in enumerate(raw_data):
         line = line.rstrip()
         if 'Showing 1-100' in line:
             num_activities = line.split()[-1]
@@ -26,8 +26,8 @@ def scan_option_activity(raw_data):
             if 'Last Volume Open Int' in line:
                 main_table_started = False
             else:
-                if line.isupper():
-                    # assume all upper case is symbol
+                if line.isupper() and (idx+2) < len(raw_data) and ('Call' in raw_data[idx+2] or 'Put' in raw_data[idx+2]):
+                    # find the anchor point
                     if new_activity:
                         option_activity_list.append(new_activity)
                         new_activity = ''
@@ -35,6 +35,7 @@ def scan_option_activity(raw_data):
         else:
             if 'Last Volume Open Int' in line:
                 main_table_started = True 
+    option_activity_list.append(new_activity)
     return (option_activity_list, num_pages)
 
 def parse_option_activity(infile):
@@ -88,9 +89,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
     # test from local copy
-    infile = os.path.join(root_dir, 'temp', 'data_option_activity.txt')
-    (option_activity_list, num_pages) = parse_option_activity(infile)
-    print ('\n'.join(option_activity_list))
+    #infile = os.path.join(root_dir, 'temp', 'data_option_activity.txt')
+    #(option_activity_list, num_pages) = parse_option_activity(infile)
     # test from lookup
-    #(option_activity_list, num_pages) = get_option_activity(save_file=True)
+    (option_activity_list, num_pages) = get_option_activity(save_file=True)
+    print ('\n'.join(option_activity_list))
 

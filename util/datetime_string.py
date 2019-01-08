@@ -6,6 +6,8 @@ def get_date(date_str):
     # convert a regular date string into datetime object
     if len(date_str) == 8 and date_str[2] == '/' and date_str[5] == '/':
         return datetime.datetime.strptime(date_str, '%m/%d/%y')
+    elif len(date_str) == 6 and date_str.isdigit():
+        return datetime.datetime.strptime(date_str, '%y%m%d')
     else:
         return datetime.datetime.now()
 
