@@ -14,14 +14,10 @@ from data_retrieve.get_web_element import ChromeDriver
 
 def scan_option_activity(raw_data):
     option_activity_list = []
-    num_pages = 0
     main_table_started = False
     new_activity = ''
     for idx,line in enumerate(raw_data):
         line = line.rstrip()
-        if 'Showing 1-100' in line:
-            num_activities = line.split()[-1]
-            num_pages = floor((int(num_activities) + 99) / 100)
         if main_table_started:
             if 'Last Volume Open Int' in line:
                 main_table_started = False
@@ -36,7 +32,7 @@ def scan_option_activity(raw_data):
             if 'Last Volume Open Int' in line:
                 main_table_started = True 
     option_activity_list.append(new_activity)
-    return (option_activity_list, num_pages)
+    return option_activity_list
 
 def parse_option_activity(infile):
     try:
@@ -45,28 +41,28 @@ def parse_option_activity(infile):
     except:
         logger.error('%s error reading %s' % (get_time_log(), infile))
         return ([''], 0)
-    (option_activity_list, num_pages) = scan_option_activity(fin.readlines())
-    return (option_activity_list, num_pages)
+    option_activity_list = scan_option_activity(fin.readlines())
+    return option_activity_list
 
-def lookup_option_activity(page_idx):
+def lookup_option_activity():
     # read web data
-    url = 'https://www.barchart.com/options/unusual-activity/stocks?page=%u' % page_idx
+    url = 'https://www.barchart.com/options/unusual-activity/stocks'
     eid = 'main-content-column'
-    chrome_driver = ChromeDriver(height=3240)
-    web_data = chrome_driver.download_data(url=url, element_id=eid)
-    chrome_driver.close()
+    show_all = 'a.show-all.ng-scope'
+    try:
+        chrome_driver = ChromeDriver(height=1080)
+        web_data = chrome_driver.download_data(url=url, button_css_sel=show_all, element_id=eid)
+    except:
+        web_data = None
+    try:
+        chrome_driver.close()
+    except:
+        pass
     # lookup
     return scan_option_activity(web_data.splitlines())
 
 def get_option_activity(save_file=False):
-    # first get total number of pages
-    (option_activity_list, num_pages) = lookup_option_activity(page_idx=1)
-    # FIXME: specifying page index in the URL does not work
-    num_pages = 1
-    # TODO: should parallelize the work
-    for page_idx in range(2, num_pages+1):
-        (oa, num) = lookup_option_activity(page_idx=page_idx)
-        option_activity_list.extend(oa)
+    option_activity_list = lookup_option_activity()
     # save a copy
     if save_file:
         file_dir = os.path.abspath(os.path.dirname(__file__))
@@ -79,7 +75,7 @@ def get_option_activity(save_file=False):
         with open(filename, 'w') as fout:
             fout.write('\n'.join(option_activity_list))
         logger.info('%s save option activity to %s' % (get_time_log(), filename))
-    return (option_activity_list, num_pages)
+    return option_activity_list
 
 if __name__ == '__main__':
     meta_data_dir = os.path.join(root_dir, 'logs')
@@ -90,8 +86,8 @@ if __name__ == '__main__':
     logging.getLogger().addHandler(logging.StreamHandler())
     # test from local copy
     #infile = os.path.join(root_dir, 'temp', 'data_option_activity.txt')
-    #(option_activity_list, num_pages) = parse_option_activity(infile)
+    #option_activity_list = parse_option_activity(infile)
     # test from lookup
-    (option_activity_list, num_pages) = get_option_activity(save_file=True)
+    option_activity_list = get_option_activity(save_file=True)
     print ('\n'.join(option_activity_list))
 

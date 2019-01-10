@@ -90,7 +90,7 @@ class OptionActivity:
             self.__set('symbol', items[0])
             self.__set('ref_price', float(items[1].replace(',', '')))
             self.__set('option_type', items[2])
-            self.__set('strike_price', float(items[3].replace(',', '')))
+            self.__set('strike_price', float(items[3].replace(',', '').replace('*','')))
             self.__set('exp_date', get_date_str(get_date(items[4])))
             self.__set('day_to_exp', int(items[5]))
             self.__set('option_price', float(items[9].replace(',', '')))
@@ -121,10 +121,10 @@ if __name__ == '__main__':
     # test from local copy
 #    from data_retrieve.parse_barchart_activity import parse_option_activity
 #    infile = os.path.join(root_dir, 'temp', 'data_option_activity.txt')
-#    (option_activity_list, num_pages) = parse_option_activity(infile)
+#    option_activity_list = parse_option_activity(infile)
     # test from online reading
     from data_retrieve.parse_barchart_activity import get_option_activity
-    (option_activity_list, num_pages) = get_option_activity(save_file=True)
+    option_activity_list = get_option_activity(save_file=True)
     # test from formatted file
 #    infile = os.path.join(root_dir, 'logs', 'OA_190108_142404.txt')
 #    fin = open(infile, 'r')

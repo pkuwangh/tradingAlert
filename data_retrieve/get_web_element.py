@@ -18,13 +18,14 @@ class ChromeDriver:
     binary_path = '/usr/bin/google-chrome'
     driver_path = '/usr/local/bin/chromedriver'
 
-    def __init__(self, width=1920, height=3240):
+    def __init__(self, width=1920, height=1080):
         self.chrome_options = Options()
         self.chrome_options.add_argument('--headless')
         self.chrome_options.add_argument('--window-size=1920,3240')
         self.chrome_options.binary_location = ChromeDriver.binary_path
         num_retry = 0
-        while num_retry < 3:
+        retry_timeout = 4
+        while num_retry < retry_timeout:
             try:
                 self.driver = webdriver.Chrome(executable_path=ChromeDriver.driver_path,
                         options=self.chrome_options)
@@ -34,15 +35,15 @@ class ChromeDriver:
                 time.sleep(10)
                 num_retry += 1
                 continue
-            if num_retry >= 3:
-                raise
+        if num_retry >= retry_timeout:
+            raise
 
-    def download_data(self, url, element_id=None, class_name=None, outfile=None):
+    def download_data(self, url, button_css_sel=None, element_id=None, element_class_name=None, outfile=None):
         logger.info('%s download data from %s'
                 % (get_time_log(), url))
         num_retry = 0
         element = None
-        while num_retry < 3:
+        while num_retry < 8:
             num_retry += 1
             # access the url
             try:
@@ -52,6 +53,14 @@ class ChromeDriver:
                         % (url, e))
                 time.sleep(10)
                 continue
+            # click a button if needed
+            if button_css_sel:
+                try:
+                    button = self.driver.find_element_by_css_selector(button_css_sel).click()
+                except Exception as e:
+                    logger.error('error when getting button=%s: %s'
+                            % (button_css_sel, e))
+                    continue
             # get the target element
             if element_id:
                 try:
@@ -60,12 +69,12 @@ class ChromeDriver:
                     logger.error('error when getting element=%s: %s'
                             % (element_id, e))
                     continue
-            elif class_name:
+            elif element_class_name:
                 try:
-                    element = self.driver.find_element_by_class_name(class_name)
+                    element = self.driver.find_element_by_class_name(element_class_name)
                 except Exception as e:
                     logger.error('error when getting class=%s: %s'
-                            % (class_name, e))
+                            % (element_class_name, e))
                     continue
             else:
                 logger.error('Do not know how to find element')
@@ -78,7 +87,8 @@ class ChromeDriver:
                 with open(outfile, 'w') as fout:
                     fout.write(element.text)
             return element.text
-        return ''
+        else:
+            raise
 
     def close(self):
         self.driver.close()
@@ -87,7 +97,7 @@ if __name__ == '__main__':
     import os
     import os.path
     root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
-    temp_dir = os.path.join(root_dir, 'logs')
+    temp_dir = os.path.join(root_dir, 'temp')
     if not os.path.exists(temp_dir):
         os.makedirs(temp_dir)
     log_file = os.path.join(temp_dir, 'log.' + __name__)
@@ -103,7 +113,7 @@ if __name__ == '__main__':
     data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
     print (data)
     # option activity
-    url = 'https://www.barchart.com/options/unusual-activity/stocks?orderBy=tradeTime&orderDir=desc&page=1'
+    url = 'https://www.barchart.com/options/unusual-activity/stocks'
     eid = 'main-content-column'
     outfile = os.path.join(temp_dir, 'data_option_activity.txt')
     data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)

@@ -54,9 +54,18 @@ def lookup_option_info(symbol, exp_date, option_type, strike, save_file=False):
     url = 'https://finance.yahoo.com/quote/%s/options?date=%s' \
             % (symbol, get_date_in_url(exp_date))
     eid = 'Col1-1-OptionContracts-Proxy'
-    chrome_driver = ChromeDriver(height=3240)
-    web_data = chrome_driver.download_data(url=url, element_id=eid)
-    chrome_driver.close()
+    try:
+        chrome_driver = ChromeDriver(height=1080)
+        web_data = chrome_driver.download_data(url=url, element_id=eid)
+    except:
+        web_data = None
+    try:
+        chrome_driver.close()
+    except:
+        pass
+    # something wrong
+    if web_data is None:
+        return (False, 0)
     # lookup
     (contract_name, found, open_interest) = \
             scan_option_chain(symbol, exp_date, option_type, strike, web_data.splitlines())
