@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
-from util.datetime_string import *
+from utils.datetime_string import *
 
 class ChromeDriver:
     # class members

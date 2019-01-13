@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
-from util.datetime_string import *
-from data_retrieve.get_web_element import ChromeDriver
+from utils.datetime_string import *
+from data_source.get_web_element import ChromeDriver
 
 def scan_option_activity(raw_data):
     option_activity_list = []

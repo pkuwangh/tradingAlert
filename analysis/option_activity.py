@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
-from util.datetime_string import *
+from utils.datetime_string import *
 
 class OptionActivity:
     __keys = ['activity_str',       # initial string
@@ -119,11 +119,11 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
     # test from local copy
-#    from data_retrieve.parse_barchart_activity import parse_option_activity
+#    from data_source.parse_barchart_activity import parse_option_activity
 #    infile = os.path.join(root_dir, 'temp', 'data_option_activity.txt')
 #    option_activity_list = parse_option_activity(infile)
     # test from online reading
-    from data_retrieve.parse_barchart_activity import get_option_activity
+    from data_source.parse_barchart_activity import get_option_activity
     option_activity_list = get_option_activity(save_file=True)
     # test from formatted file
 #    infile = os.path.join(root_dir, 'logs', 'OA_190108_142404.txt')
