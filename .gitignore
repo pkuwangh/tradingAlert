@@ -105,3 +105,4 @@ venv.bak/
 
 # local
 /logs
+/email/sender.json
