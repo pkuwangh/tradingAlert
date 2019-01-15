@@ -130,10 +130,17 @@ if __name__ == '__main__':
 #    fin = open(infile, 'r')
 #    option_activity_list = fin.readlines()
 
+    filtered_list = []
     for line in option_activity_list:
         option_activity = OptionActivity()
         option_activity.from_activity_str(line)
         if option_activity.is_inited():
-            if option_activity.get('vol_oi') > 80 or option_activity.get('ext_value') > 20 or option_activity.get('total_cost') > 200:
+            if option_activity.get('vol_oi') > 80 or option_activity.get('ext_value') > 40 or option_activity.get('total_cost') > 200:
                 print (option_activity.get_display_str())
-
+                filtered_list.append(option_activity.get_display_str())
+    # send email
+    subject = 'Option activity on %s' % get_datetime_str(datetime.datetime.now())
+    text = '\n'.join(filtered_list)
+    from utils.send_email import MailMan
+    mail_man = MailMan()
+    mail_man.send(subject=subject, content=text)

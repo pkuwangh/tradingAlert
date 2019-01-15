@@ -29,9 +29,11 @@ class ChromeDriver:
             try:
                 self.driver = webdriver.Chrome(executable_path=ChromeDriver.driver_path,
                         options=self.chrome_options)
+                if num_retry > 0:
+                    logger.info('finally succeed after retrying %d times' % (num_retry))
                 break
             except Exception as e:
-                logger.error('error when init driver: %s' % (e))
+                logger.error('error when init driver (num_retry=%d): %s' % (num_retry, e))
                 time.sleep(10)
                 num_retry += 1
                 continue
