@@ -62,7 +62,9 @@ class ChromeDriver:
                 except Exception as e:
                     logger.error('error when getting button=%s: %s'
                             % (button_css_sel, e))
-                    continue
+                    if num_retry < 4:
+                        time.sleep(10)
+                        continue
             # get the target element
             if element_id:
                 try:
@@ -70,6 +72,7 @@ class ChromeDriver:
                 except Exception as e:
                     logger.error('error when getting element=%s: %s'
                             % (element_id, e))
+                    time.sleep(10)
                     continue
             elif element_class_name:
                 try:
@@ -77,6 +80,7 @@ class ChromeDriver:
                 except Exception as e:
                     logger.error('error when getting class=%s: %s'
                             % (element_class_name, e))
+                    time.sleep(10)
                     continue
             else:
                 logger.error('Do not know how to find element')

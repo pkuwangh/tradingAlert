@@ -31,12 +31,13 @@ class OptionActivity:
             self.__values[k] = None
 
     def get_display_str(self):
-        return '%-4s ratio=%.0f cost=%.0fK ext=%.0fK %s %.1f->%.1f exp=%s days=%d vol=%.1fK date=%s' % \
-                (self.__peek('symbol', is_str=True), self.__peek('vol_oi'),
-                        self.__peek('total_cost'), self.__peek('ext_value'),
-                        self.__peek('option_type', is_str=True),
+        return '%-4s %-4s %.1f->%.1f exp=%s ratio=%.0f cost=%.0fK ext=%.0fK days=%d vol=%.1fK date=%s' % \
+                (self.__peek('symbol', is_str=True), self.__peek('option_type', is_str=True),
                         self.__peek('ref_price'), self.__peek('strike_price'),
-                        self.__peek('exp_date', is_str=True), self.__peek('day_to_exp'),
+                        self.__peek('exp_date', is_str=True),
+                        self.__peek('vol_oi'),
+                        self.__peek('total_cost'), self.__peek('ext_value'),
+                        self.__peek('day_to_exp'),
                         self.__peek('volumn')/1000,
                         self.__peek('deal_time', is_str=True))
 
@@ -126,7 +127,7 @@ if __name__ == '__main__':
     from data_source.parse_barchart_activity import get_option_activity
     option_activity_list = get_option_activity(save_file=True)
     # test from formatted file
-#    infile = os.path.join(root_dir, 'logs', 'OA_190108_142404.txt')
+#    infile = os.path.join(root_dir, 'logs', 'OA_190114_173038.txt')
 #    fin = open(infile, 'r')
 #    option_activity_list = fin.readlines()
 

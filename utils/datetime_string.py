@@ -15,7 +15,7 @@ def get_date_str(datetime_obj=None):
     # convert a datetime object into regular date string
     if datetime_obj is None:
         datetime_obj = datetime.datetime.now()
-    datetime_obj.strftime('%y%m%d')
+    return datetime_obj.strftime('%y%m%d')
 
 def get_datetime_str(datetime_obj=None):
     # convert a datetime object
