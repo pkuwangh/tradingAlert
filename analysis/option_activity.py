@@ -78,10 +78,10 @@ class OptionActivity:
         else:
             pure_price = self.get('option_price')
         # extrinsic value
-        ext_value = self.get('volumn') * pure_price / 1000
+        ext_value = self.get('volumn') * pure_price * 100 / 1000
         self.__set('ext_value', ext_value)
         # total cost
-        total_cost = self.get('volumn') * self.get('option_price') / 1000
+        total_cost = self.get('volumn') * self.get('option_price') * 100 / 1000
         self.__set('total_cost', total_cost)
 
     def from_activity_str(self, option_activity_str):
@@ -127,7 +127,7 @@ if __name__ == '__main__':
     from data_source.parse_barchart_activity import get_option_activity
     option_activity_list = get_option_activity(save_file=True)
     # test from formatted file
-#    infile = os.path.join(root_dir, 'logs', 'OA_190114_173038.txt')
+#    infile = os.path.join(root_dir, 'logs', 'OA_190119_022754.txt')
 #    fin = open(infile, 'r')
 #    option_activity_list = fin.readlines()
 
@@ -136,7 +136,7 @@ if __name__ == '__main__':
         option_activity = OptionActivity()
         option_activity.from_activity_str(line)
         if option_activity.is_inited():
-            if option_activity.get('vol_oi') > 80 or option_activity.get('ext_value') > 40 or option_activity.get('total_cost') > 200:
+            if option_activity.get('vol_oi') > 10 and option_activity.get('ext_value') > 200 and option_activity.get('total_cost') > 2000:
                 print (option_activity.get_display_str())
                 filtered_list.append(option_activity.get_display_str())
     # send email
