@@ -41,6 +41,15 @@ class OptionActivity:
                         self.__peek('volumn')/1000,
                         self.__peek('deal_time', is_str=True))
 
+    def get_signature(self):
+        if not self.__inited:
+            raise
+        return 'On' + self.__values['deal_time'] + \
+                self.__values['symbol'] + \
+                self.__values['exp_date'] + \
+                self.__values['option_type'] + \
+                str(int(self.__values['strike_price'] * 100))
+
     def is_inited(self):
         return self.__inited
 
@@ -112,6 +121,12 @@ class OptionActivity:
         self.__inited = True
         self.__derive()
 
+    def serialize(self):
+        filename = os.path.join(root_dir, 'records', self.get_signature())
+        import json
+        with open(filename, 'w') as fp:
+            json.dump(self.__values, fp, indent=4)
+
 if __name__ == '__main__':
     meta_data_dir = os.path.join(root_dir, 'logs')
     if not os.path.exists(meta_data_dir):
@@ -136,8 +151,9 @@ if __name__ == '__main__':
         option_activity = OptionActivity()
         option_activity.from_activity_str(line)
         if option_activity.is_inited():
-            if option_activity.get('vol_oi') > 10 and option_activity.get('ext_value') > 200 and option_activity.get('total_cost') > 2000:
+            if option_activity.get('vol_oi') > 40 or option_activity.get('ext_value') > 500 or option_activity.get('total_cost') > 2000:
                 print (option_activity.get_display_str())
+                option_activity.serialize()
                 filtered_list.append(option_activity.get_display_str())
     # send email
     subject = 'Option activity on %s' % get_datetime_str(datetime.datetime.now())
