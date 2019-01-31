@@ -44,7 +44,7 @@ class OptionActivity:
     def get_signature(self):
         if not self.__inited:
             raise
-        return 'On' + self.__values['deal_time'] + \
+        return 'Act' + self.__values['deal_time'] + \
                 self.__values['symbol'] + \
                 self.__values['exp_date'] + \
                 self.__values['option_type'] + \
@@ -139,25 +139,32 @@ if __name__ == '__main__':
 #    infile = os.path.join(root_dir, 'temp', 'data_option_activity.txt')
 #    option_activity_list = parse_option_activity(infile)
     # test from online reading
-    from data_source.parse_barchart_activity import get_option_activity
-    option_activity_list = get_option_activity(save_file=True)
+#    from data_source.parse_barchart_activity import get_option_activity
+#    option_activity_list = get_option_activity(save_file=True)
     # test from formatted file
-#    infile = os.path.join(root_dir, 'logs', 'OA_190119_022754.txt')
-#    fin = open(infile, 'r')
-#    option_activity_list = fin.readlines()
+    infile = os.path.join(root_dir, 'logs', 'OA_190130_150731.txt')
+    fin = open(infile, 'r')
+    option_activity_list = fin.readlines()
 
     filtered_list = []
     for line in option_activity_list:
         option_activity = OptionActivity()
         option_activity.from_activity_str(line)
         if option_activity.is_inited():
-            if option_activity.get('vol_oi') > 40 or option_activity.get('ext_value') > 500 or option_activity.get('total_cost') > 2000:
-                print (option_activity.get_display_str())
-                option_activity.serialize()
+            mid_ratio = (option_activity.get('vol_oi') > 5)
+            high_ratio = (option_activity.get('vol_oi') > 40)
+            mid_ext = (option_activity.get('ext_value') > 100)
+            high_ext = (option_activity.get('ext_value') > 500)
+            high_cost = (option_activity.get('total_cost') > 1000)
+            if (mid_ratio and high_ext and high_cost) or (high_ratio and mid_ext):
+#                option_activity.serialize()
                 filtered_list.append(option_activity.get_display_str())
+    filtered_list.sort()
+    for item in filtered_list:
+        print (item)
     # send email
-    subject = 'Option activity on %s' % get_datetime_str(datetime.datetime.now())
-    text = '\n'.join(filtered_list)
-    from utils.send_email import MailMan
-    mail_man = MailMan()
-    mail_man.send(subject=subject, content=text)
+    #subject = 'Option activity on %s' % get_datetime_str(datetime.datetime.now())
+    #text = '\n'.join(filtered_list)
+    #from utils.send_email import MailMan
+    #mail_man = MailMan()
+    #mail_man.send(subject=subject, content=text)

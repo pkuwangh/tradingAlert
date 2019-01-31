@@ -85,8 +85,12 @@ class ChromeDriver:
             else:
                 logger.error('Do not know how to find element')
             # done if found element
-            if element:
+            if element and element.text:
                 break
+            else:
+                logger.error('did not get the element? retry=%u', num_retry)
+                time.sleep(30)
+                continue
         # output & return
         if element:
             if outfile:
