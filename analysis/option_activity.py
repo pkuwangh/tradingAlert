@@ -139,12 +139,12 @@ if __name__ == '__main__':
 #    infile = os.path.join(root_dir, 'temp', 'data_option_activity.txt')
 #    option_activity_list = parse_option_activity(infile)
     # test from online reading
-#    from data_source.parse_barchart_activity import get_option_activity
-#    option_activity_list = get_option_activity(save_file=True)
+    from data_source.parse_barchart_activity import get_option_activity
+    option_activity_list = get_option_activity(save_file=True)
     # test from formatted file
-    infile = os.path.join(root_dir, 'logs', 'OA_190130_150731.txt')
-    fin = open(infile, 'r')
-    option_activity_list = fin.readlines()
+#    infile = os.path.join(root_dir, 'logs', 'OA_190130_150731.txt')
+#    fin = open(infile, 'r')
+#    option_activity_list = fin.readlines()
 
     filtered_list = []
     for line in option_activity_list:
