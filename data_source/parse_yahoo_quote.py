@@ -16,19 +16,48 @@ def scan_quote_summary(symbol, quote_summary_table):
     logger.info('%s lookup %s quote summary' % (get_time_log(), symbol))
     quote_info['market_cap'] = 0
     quote_info['open_price'] = 0
-    quote_info['avg_volumn'] = 0
-    return (True, quote_info)
-
-def parse_option_summary(symbol, infile):
-    try:
-        fin = open(infile, 'r')
-        logger.info('%s lookup file %s for %s'
-                % (get_time_log(), infile, symbol))
-    except:
-        logger.error('%s error reading %s' % (get_time_log(), infile))
-        return (False, None)
-    quote_summary_table = fin.readlines()
-    return scan_quote_summary(symbol, quote_summary_table)
+    quote_info['avg_volume'] = 0
+    quote_info['volume'] = 0
+    status_good = True
+    for line in quote_summary_table:
+        items = line.split()
+        if 'Market Cap' in line:
+            try:
+                value_str = items[-1].replace(',', '')
+                if value_str[-1] == 'T':
+                    value = float(value_str[:-1]) * 1e12
+                elif value_str[-1] == 'B':
+                    value = float(value_str[:-1]) * 1e9
+                elif value_str[-1] == 'M':
+                    value = float(value_str[:-1]) * 1e6
+                elif value_str[-1] == 'K':
+                    value = float(value_str[:-1]) * 1e3
+                else:
+                    value = float(value_str)
+                quote_info['market_cap'] = value
+            except:
+                status_good = False
+        elif 'Open' in line:
+            try:
+                quote_info['open_price'] = float(items[-1].replace(',', ''))
+            except:
+                status_good = False
+        elif 'Avg. Volume' in line:
+            try:
+                quote_info['avg_volume'] = int(items[-1].replace(',', ''))
+            except:
+                status_good = False
+        elif 'Volume' in line:
+            try:
+                quote_info['volume'] = int(items[-1].replace(',', ''))
+            except:
+                status_good = False
+    if not status_good:
+        logger.error('%s error scanning %s; resulting cap=%d open=%d avg_vol=%d vol=%d\n'
+                % (get_time_log(), symbol,
+                    quote_info['market_cap'], quote_info['open_price'],
+                    quote_info['avg_volume'], quote_info['volume']))
+    return (status_good, quote_info)
 
 def lookup_quote_summary(symbol, save_file=False, folder='logs'):
     # read web data
@@ -71,8 +100,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
     (found, quote_info) = lookup_quote_summary('NVDA', save_file=True)
-    print ('%s market_cap=%d open_price=%d avg_volumn=%d'
+    print ('%s market_cap=%d open_price=%d avg_volume=%d volume=%d'
             % ('NVDA',
                 quote_info['market_cap'],
                 quote_info['open_price'],
-                quote_info['avg_volumn']))
+                quote_info['avg_volume'],
+                quote_info['volume']))

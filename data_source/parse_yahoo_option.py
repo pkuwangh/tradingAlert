@@ -18,7 +18,7 @@ def get_date_in_url(exp_date):
 
 def extract_contract_info(contract):
     option_items = contract.split()
-    option_interest = (int)(option_items[-2])
+    option_interest = (int)(option_items[-2].replace(',', ''))
     return (option_interest)
 
 def scan_option_chain(symbol, exp_date, option_type, strike, option_chain):
@@ -36,20 +36,7 @@ def scan_option_chain(symbol, exp_date, option_type, strike, option_chain):
             break
     return (contract_name, open_interest >= 0, open_interest)
 
-def parse_option_info(symbol, exp_date, option_type, strike, infile):
-    try:
-        logger.info('%s lookup file %s for %s exp=%s %s at % .1f'
-                % (get_time_log(), infile, symbol, get_date_str(exp_date), option_type, strike))
-        fin = open(infile, 'r')
-    except:
-        logger.error('%s error reading %s' % (get_time_log(), infile))
-        return (False, 0)
-    option_chain = fin.readlines()
-    (contract_name, found, open_interest) = \
-            scan_option_chain(symbol, exp_date, option_type, strike, option_chain)
-    return (found, open_interest)
-
-def lookup_option_info(symbol, exp_date, option_type, strike, save_file=False):
+def lookup_option_chain_info(symbol, exp_date, option_type, strike, save_file=False):
     # read web data
     url = 'https://finance.yahoo.com/quote/%s/options?date=%s' \
             % (symbol, get_date_in_url(exp_date))
@@ -90,10 +77,8 @@ if __name__ == '__main__':
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
     logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
-#    exp_date = datetime.datetime(2018,11,16)
-#    infile = os.path.join(root_dir, 'temp', 'data_msft_option_chain.txt')
-#    (found, open_interest) = parse_option_info('MSFT', exp_date, 'C', 70, infile)
-    exp_date = datetime.datetime(2018,12,28)
-    (found, open_interest) = lookup_option_info('MSFT', exp_date, 'P', 100, True)
+
+    exp_date = datetime.datetime(2020,1,17)
+    (found, open_interest) = lookup_option_chain_info('MSFT', exp_date, 'P', 100, True)
     print ('open interest is %d' % (open_interest))
 
