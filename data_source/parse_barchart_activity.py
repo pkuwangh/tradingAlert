@@ -61,13 +61,13 @@ def lookup_option_activity():
     # lookup
     return scan_option_activity(web_data.splitlines())
 
-def get_option_activity(save_file=False):
+def get_option_activity(save_file=False, folder='logs'):
     option_activity_list = lookup_option_activity()
     # save a copy
     if save_file:
         file_dir = os.path.abspath(os.path.dirname(__file__))
         root_dir = '/'.join(file_dir.split('/')[:-1])
-        meta_data_dir = os.path.join(root_dir, 'logs')
+        meta_data_dir = os.path.join(root_dir, folder)
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
         today_time_str = get_datetime_str(datetime.datetime.now())

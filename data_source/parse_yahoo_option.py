@@ -36,7 +36,7 @@ def scan_option_chain(symbol, exp_date, option_type, strike, option_chain):
             break
     return (contract_name, open_interest >= 0, open_interest)
 
-def lookup_option_chain_info(symbol, exp_date, option_type, strike, save_file=False):
+def lookup_option_chain_info(symbol, exp_date, option_type, strike, save_file=False, folder='logs'):
     # read web data
     url = 'https://finance.yahoo.com/quote/%s/options?date=%s' \
             % (symbol, get_date_in_url(exp_date))
@@ -60,7 +60,7 @@ def lookup_option_chain_info(symbol, exp_date, option_type, strike, save_file=Fa
     if save_file:
         file_dir = os.path.abspath(os.path.dirname(__file__))
         root_dir = '/'.join(file_dir.split('/')[:-1])
-        meta_data_dir = os.path.join(root_dir, 'logs')
+        meta_data_dir = os.path.join(root_dir, folder)
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
         today_date_str = get_date_str(datetime.datetime.today())

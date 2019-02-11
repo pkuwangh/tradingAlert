@@ -140,7 +140,7 @@ if __name__ == '__main__':
 #    option_activity_list = parse_option_activity(infile)
     # test from online reading
     from data_source.parse_barchart_activity import get_option_activity
-    option_activity_list = get_option_activity(save_file=True)
+    option_activity_list = get_option_activity(save_file=True, folder='logs')
     # test from formatted file
 #    infile = os.path.join(root_dir, 'logs', 'OA_190130_150731.txt')
 #    fin = open(infile, 'r')
