@@ -86,7 +86,7 @@ def lookup_quote_summary(symbol, save_file=False, folder='logs'):
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
         today_date_str = get_date_str(datetime.datetime.today())
-        filename = os.path.join(meta_data_dir, symbol + '_' + today_date_str + '.txt')
+        filename = os.path.join(meta_data_dir, symbol + '_quote_' + today_date_str + '.txt')
         with open(filename, 'w') as fout:
             fout.write(web_data)
         logger.info('%s save %s quote summary to %s' % (get_time_log(), symbol, filename))
