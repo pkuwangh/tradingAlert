@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 import os
 import sys
 import time
+import random
 import logging
 logger = logging.getLogger(__name__)
 
@@ -55,6 +56,7 @@ class ChromeDriver:
                         % (url, e))
                 time.sleep(10)
                 continue
+            time.sleep(5*random.random())
             # click a button if needed
             if button_css_sel:
                 try:

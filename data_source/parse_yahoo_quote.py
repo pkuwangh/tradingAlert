@@ -14,11 +14,11 @@ from data_source.get_web_element import ChromeDriver
 def scan_quote_summary(symbol, quote_summary_table):
     quote_info = {}
     logger.info('%s lookup %s quote summary' % (get_time_log(), symbol))
-    quote_info['market_cap'] = 0
-    quote_info['open_price'] = 0
-    quote_info['avg_volume'] = 0
-    quote_info['volume'] = 0
-    status_good = True
+    quote_info['market_cap'] = -1
+    quote_info['open_price'] = -1
+    quote_info['avg_volume'] = -1
+    quote_info['volume']     = -1
+    status_bad = False
     for line in quote_summary_table:
         items = line.split()
         if 'Market Cap' in line:
@@ -36,28 +36,30 @@ def scan_quote_summary(symbol, quote_summary_table):
                     value = float(value_str)
                 quote_info['market_cap'] = value
             except:
-                status_good = False
+                status_bad = True
         elif 'Open' in line:
             try:
                 quote_info['open_price'] = float(items[-1].replace(',', ''))
             except:
-                status_good = False
+                status_bad = True
         elif 'Avg. Volume' in line:
             try:
                 quote_info['avg_volume'] = int(items[-1].replace(',', ''))
             except:
-                status_good = False
+                status_bad = True
         elif 'Volume' in line:
             try:
                 quote_info['volume'] = int(items[-1].replace(',', ''))
             except:
-                status_good = False
-    if not status_good:
-        logger.error('%s error scanning %s; resulting cap=%d open=%d avg_vol=%d vol=%d\n'
+                status_bad = True
+    if status_bad:
+        logger.error('%s error scanning %s quote; resulting cap=%d open=%d avg_vol=%d vol=%d\n'
                 % (get_time_log(), symbol,
                     quote_info['market_cap'], quote_info['open_price'],
                     quote_info['avg_volume'], quote_info['volume']))
-    return (status_good, quote_info)
+    all_found = (min(quote_info.values()) >= 0)
+    return (all_found, quote_info)
+
 
 def lookup_quote_summary(symbol, save_file=False, folder='logs'):
     # read web data
