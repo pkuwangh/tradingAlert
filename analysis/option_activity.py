@@ -18,11 +18,16 @@ class OptionActivity:
             'exp_date',
             'day_to_exp',
             'option_price',
-            'volumn',
+            'volume',
             'vol_oi',
             'deal_time',
             'total_cost',           # derived
-            'ext_value']
+            'ext_value',
+            'option_volume',        # separate lookup
+            'avg_option_volume',
+            'stock_volume',
+            'avg_stock_volume',
+            'market_cap']
 
     def __init__(self):
         self.__inited = False
@@ -31,15 +36,19 @@ class OptionActivity:
             self.__values[k] = None
 
     def get_display_str(self):
-        return '%-4s %-4s %.1f->%.1f exp=%s ratio=%.0f cost=%.0fK ext=%.0fK days=%d vol=%.1fK date=%s' % \
+        return '%-4s %-4s %.1f->%.1f exp=%s vol/oi=%.0f cost=%.1fM ext=%.2fM days=%d vol=%.1fK date=%s' % \
                 (self.__peek('symbol', is_str=True), self.__peek('option_type', is_str=True),
                         self.__peek('ref_price'), self.__peek('strike_price'),
                         self.__peek('exp_date', is_str=True),
                         self.__peek('vol_oi'),
                         self.__peek('total_cost'), self.__peek('ext_value'),
                         self.__peek('day_to_exp'),
-                        self.__peek('volumn')/1000,
+                        self.__peek('volume')/1000,
                         self.__peek('deal_time', is_str=True))
+
+    def get_ext_display_str(self):
+        return get_display_str() + ' tot_vol=%.1fK avg_vol=%.1fK' % \
+                (self.__peek('option_volume'), self.__peek('avg_option_volume'))
 
     def get_signature(self):
         if not self.__inited:
@@ -77,6 +86,15 @@ class OptionActivity:
             raise
         self.__values[key] = value
 
+    def set_option_quote(self, option_volume, avg_option_volume):
+        self.__set('option_volume', option_volume)
+        self.__set('avg_option_volume', avg_option_volume)
+
+    def set_stock_quote(self, stock_volume, avg_stock_volume, market_cap):
+        self.__set('stock_volume', stock_volume)
+        self.__set('avg_stock_volume', avg_stock_volume)
+        self.__set('market_cap', market_cap)
+
     def __derive(self):
         in_money_call = self.is_call() and self.get('strike_price') < self.get('ref_price')
         in_money_put = self.is_put() and self.get('strike_price') > self.get('ref_price')
@@ -87,10 +105,10 @@ class OptionActivity:
         else:
             pure_price = self.get('option_price')
         # extrinsic value
-        ext_value = self.get('volumn') * pure_price * 100 / 1000
+        ext_value = self.get('volume') * pure_price * 100 / 1000
         self.__set('ext_value', ext_value)
         # total cost
-        total_cost = self.get('volumn') * self.get('option_price') * 100 / 1000
+        total_cost = self.get('volume') * self.get('option_price') * 100 / 1000
         self.__set('total_cost', total_cost)
 
     def from_activity_str(self, option_activity_str):
@@ -104,22 +122,21 @@ class OptionActivity:
             self.__set('exp_date', get_date_str(get_date(items[4])))
             self.__set('day_to_exp', int(items[5]))
             self.__set('option_price', float(items[9].replace(',', '')))
-            self.__set('volumn', int(items[10].replace(',', '')))
+            self.__set('volume', int(items[10].replace(',', '')))
             self.__set('vol_oi', float(items[12].replace(',', '')))
             self.__set('deal_time', get_date_str(get_date(items[14])))
             self.__inited = True
             self.__derive()
         except Exception as e:
-            logger.error('error processing %s: %s', option_activity_str.rstrip(), e)
+            logger.error('error processing %s: %s' % (option_activity_str.rstrip(), e))
 
     def from_json_entry(self, json_filename, json_dict):
         for k in json_dict:
             try:
                 self.__set(k, json_dict[k])
             except Exception as e:
-                logger.error('error processing %s from %s: %s', k, json_filename, e)
+                logger.error('error processing %s from %s: %s' % (k, json_filename, e))
         self.__inited = True
-        self.__derive()
 
     def serialize(self):
         filename = os.path.join(root_dir, 'records', self.get_signature())
