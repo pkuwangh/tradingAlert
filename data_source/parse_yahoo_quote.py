@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
 from utils.datetime_string import *
+from utils.file_rdwr import *
 from data_source.get_web_element import ChromeDriver
 
 def scan_quote_summary(symbol, quote_summary_table):
@@ -88,8 +89,8 @@ def lookup_quote_summary(symbol, save_file=False, folder='logs'):
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
         today_date_str = get_date_str(datetime.datetime.today())
-        filename = os.path.join(meta_data_dir, symbol + '_quote_' + today_date_str + '.txt')
-        with open(filename, 'w') as fout:
+        filename = os.path.join(meta_data_dir, symbol + '_quote_' + today_date_str + '.txt.gz')
+        with openw(filename, 'wt') as fout:
             fout.write(web_data)
         logger.debug('%s save %s quote summary to %s' % (get_time_log(), symbol, filename))
     return (found, quote_info)

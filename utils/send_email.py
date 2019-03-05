@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
 from utils.datetime_string import *
+from utils.file_rdwr import *
 
 class MailMan:
     def __init__(self):
@@ -21,14 +22,14 @@ class MailMan:
             import json
             # sender
             sender_json = os.path.join(root_dir, 'email', 'sender.json')
-            with open(sender_json, 'r') as fp:
+            with openw(sender_json, 'rt') as fp:
                 sender_dict = json.load(fp)
             self.__sender = list(sender_dict.keys())[-1]
             self.__password = sender_dict[self.__sender]
             self.msg['From'] = self.__sender
             # receivers
             receiver_json = os.path.join(root_dir, 'email', 'receiver.json')
-            with open(receiver_json, 'r') as fp:
+            with openw(receiver_json, 'rt') as fp:
                 receiver_dict = json.load(fp)
             receivers = [v for v in receiver_dict.values()]
             self.msg['To'] = ','.join(receivers)
@@ -56,7 +57,7 @@ class MailMan:
 
 if __name__ == '__main__':
     subject = 'Option activity on %s' % get_datetime_str(datetime.datetime.now())
-    with open(os.path.join(root_dir, 'notes.txt'), 'r') as fp:
+    with openw(os.path.join(root_dir, 'notes.txt'), 'rt') as fp:
         text = fp.read()
     # create a MailMan object
     mail_man = MailMan()

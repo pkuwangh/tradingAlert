@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
 from utils.datetime_string import *
+from utils.file_rdwr import *
 
 def filter_base(new_option_activity, option_volume_cache):
     # parameters
@@ -96,7 +97,10 @@ def hunt():
     # pull option activity list
     from data_source.parse_barchart_activity import get_option_activity
     from analysis.option_activity import OptionActivity
-    option_activity_list = get_option_activity(save_file=True, folder='records/raw_option_activity')
+#    option_activity_list = get_option_activity(save_file=True, folder='records/raw_option_activity')
+    infile = os.path.join(root_dir, 'records', 'raw_option_activity', 'OA_190304_181736.txt.gz')
+    fin = openw(infile, 'rt')
+    option_activity_list = fin.readlines()
     # look into each one
     filtered_list = []
     for line in option_activity_list:
@@ -104,6 +108,7 @@ def hunt():
         new_option_activity.from_activity_str(line)
         if filter(new_option_activity, option_volume_cache):
             filtered_list.append(new_option_activity)
+            new_option_activity.serialize('records/option_activity_live')
     filtered_list.sort()
     # dump cache
     option_volume_cache.close()

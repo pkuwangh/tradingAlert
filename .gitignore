@@ -107,6 +107,14 @@ venv.bak/
 /logs
 /email/sender.json
 /records/*.db
-/records/raw_option_activity/*.txt
-/records/raw_option_volume/*.txt
 /records/cache/option_volume.db
+/records/raw_option_activity/*.txt
+/records/raw_option_activity/*.txt.gz
+/records/raw_option_volume/*.txt
+/records/raw_option_volume/*.txt.gz
+/records/option_activity_live/*.txt
+/records/option_activity_live/*.txt.gz
+/records/option_activity_success/*.txt
+/records/option_activity_success/*.txt.gz
+/records/option_activity_failure/*.txt
+/records/option_activity_failure/*.txt.gz

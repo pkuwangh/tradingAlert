@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
 from utils.datetime_string import *
+from utils.file_rdwr import *
 
 class ChromeDriver:
     # class members
@@ -95,7 +96,7 @@ class ChromeDriver:
         # output & return
         if element:
             if outfile:
-                with open(outfile, 'w') as fout:
+                with openw(outfile, 'wt') as fout:
                     fout.write(element.text)
             return element.text
         else:

@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
 from utils.datetime_string import *
+from utils.file_rdwr import *
 
 class OptionActivity:
     __keys = ['activity_str',       # initial string
@@ -110,10 +111,10 @@ class OptionActivity:
         else:
             pure_price = self.get('option_price')
         # extrinsic value
-        ext_value = self.get('volume') * pure_price * 100 / 1000
+        ext_value = int(self.get('volume') * pure_price * 100 / 1000)
         self.__set('ext_value', ext_value)
         # total cost
-        total_cost = self.get('volume') * self.get('option_price') * 100 / 1000
+        total_cost = int(self.get('volume') * self.get('option_price') * 100 / 1000)
         self.__set('total_cost', total_cost)
 
     def from_activity_str(self, option_activity_str):
@@ -143,10 +144,15 @@ class OptionActivity:
                 logger.error('error processing %s from %s: %s' % (k, json_filename, e))
         self.__inited = True
 
-    def serialize(self):
-        filename = os.path.join(root_dir, 'records', self.get_signature())
+    def serialize(self, folder='records'):
+        file_dir = os.path.abspath(os.path.dirname(__file__))
+        root_dir = '/'.join(file_dir.split('/')[:-1])
+        meta_data_dir = os.path.join(root_dir, folder)
+        if not os.path.exists(meta_data_dir):
+            os.makedirs(meta_data_dir)
+        filename = os.path.join(meta_data_dir, self.get_signature() + '.txt.gz')
         import json
-        with open(filename, 'w') as fp:
+        with openw(filename, 'wt') as fp:
             json.dump(self.__values, fp, indent=4)
 
 if __name__ == '__main__':
@@ -165,7 +171,7 @@ if __name__ == '__main__':
     option_activity_list = get_option_activity(save_file=True, folder='logs')
     # test from formatted file
 #    infile = os.path.join(root_dir, 'logs', 'OA_190130_150731.txt')
-#    fin = open(infile, 'r')
+#    fin = openw(infile, 'rt')
 #    option_activity_list = fin.readlines()
 
     filtered_list = []

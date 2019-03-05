@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
 from utils.datetime_string import *
+from utils.file_rdwr import *
 from data_source.get_web_element import ChromeDriver
 
 def scan_option_activity(raw_data):
@@ -37,7 +38,7 @@ def scan_option_activity(raw_data):
 def parse_option_activity(infile):
     try:
         logger.info('%s lookup file %s to parse option activity' % (get_time_log(), infile))
-        fin = open(infile, 'r')
+        fin = openw(infile, 'rt')
     except:
         logger.error('%s error reading %s' % (get_time_log(), infile))
         return ([''], 0)
@@ -71,8 +72,8 @@ def get_option_activity(save_file=False, folder='logs'):
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
         today_time_str = get_datetime_str(datetime.datetime.now())
-        filename = os.path.join(meta_data_dir, 'OA_%s.txt' % (today_time_str))
-        with open(filename, 'w') as fout:
+        filename = os.path.join(meta_data_dir, 'OA_%s.txt.gz' % (today_time_str))
+        with openw(filename, 'wt') as fout:
             fout.write('\n'.join(option_activity_list))
         logger.info('%s save option activity to %s' % (get_time_log(), filename))
     return option_activity_list
