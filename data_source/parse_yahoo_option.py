@@ -26,13 +26,13 @@ def scan_option_chain(symbol, exp_date, option_type, strike, option_chain):
     exp_date_str = get_date_str(exp_date)
     strike_str = '%08d' % (strike * 1000)
     contract_name = symbol + exp_date_str + option_type + strike_str
-    logger.info('%s lookup %s exp=%s %s at %.1f'
+    logger.debug('%s lookup %s exp=%s %s at %.1f'
             % (get_time_log(), symbol, exp_date_str, option_type, strike))
     for contract in option_chain:
         if contract.startswith(contract_name):
             open_interest = extract_contract_info(contract)
-            logger.info('%s got OI=%d from {%s}'
-                    % (get_time_log(), open_interest, contract.rstrip()))
+            logger.info('%s got OI=%d for %s exp=%s from {%s}'
+                    % (get_time_log(), open_interest, symbol, exp_date_str, contract.rstrip()))
             break
     return (contract_name, open_interest >= 0, open_interest)
 
@@ -67,7 +67,7 @@ def lookup_option_chain_info(symbol, exp_date, option_type, strike, save_file=Fa
         filename = os.path.join(meta_data_dir, contract_name + '_' + today_date_str + '.txt')
         with open(filename, 'w') as fout:
             fout.write(web_data)
-        logger.info('%s save %s option chain to %s' % (get_time_log(), symbol, filename))
+        logger.debug('%s save %s option chain to %s' % (get_time_log(), symbol, filename))
     return (found, open_interest)
 
 if __name__ == '__main__':
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
-    logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
+    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
 
     exp_date = datetime.datetime(2020,1,17)

@@ -116,8 +116,10 @@ if __name__ == '__main__':
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
-    logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
-    logging.getLogger().addHandler(logging.StreamHandler())
+    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='a')
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.INFO)
+    logging.getLogger().addHandler(stream_handler)
     filtered_list = hunt()
     for item in filtered_list:
         print (item.get_ext_display_str())

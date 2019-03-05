@@ -13,7 +13,7 @@ from data_source.get_web_element import ChromeDriver
 
 def scan_quote_summary(symbol, quote_summary_table):
     quote_info = {}
-    logger.info('%s lookup %s quote summary' % (get_time_log(), symbol))
+    logger.debug('%s lookup %s quote summary' % (get_time_log(), symbol))
     quote_info['market_cap'] = -1
     quote_info['open_price'] = -1
     quote_info['avg_volume'] = -1
@@ -91,7 +91,7 @@ def lookup_quote_summary(symbol, save_file=False, folder='logs'):
         filename = os.path.join(meta_data_dir, symbol + '_quote_' + today_date_str + '.txt')
         with open(filename, 'w') as fout:
             fout.write(web_data)
-        logger.info('%s save %s quote summary to %s' % (get_time_log(), symbol, filename))
+        logger.debug('%s save %s quote summary to %s' % (get_time_log(), symbol, filename))
     return (found, quote_info)
 
 if __name__ == '__main__':
@@ -99,7 +99,7 @@ if __name__ == '__main__':
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
-    logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
+    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
     (found, quote_info) = lookup_quote_summary('NVDA', save_file=True)
     print ('%s market_cap=%d open_price=%d avg_volume=%d volume=%d'

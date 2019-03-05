@@ -11,7 +11,7 @@ sys.path.append(root_dir)
 from utils.datetime_string import *
 
 class OptionVolumeCache:
-    expire_threshold = 30   # in days
+    expire_threshold = 15   # in days
     def __init__(self, filename=None, init_dump=False):
         if filename is None:
             filename = os.path.join(root_dir, 'records', 'cache', 'avg_option_volume.db')
@@ -19,14 +19,14 @@ class OptionVolumeCache:
 
     def lookup(self, symbol, avg_only, folder='records'):
         hit = self.__cache.exists(symbol)
-        logger.info('%s lookup option volume info for %s: cache-hit=%d' % (get_time_log(), symbol, hit))
+        logger.debug('%s lookup option volume info for %s: cache-hit=%d' % (get_time_log(), symbol, hit))
         # lookup the cache
         if self.__cache.exists(symbol):
             # hit
             (option_info, update_date) = self.__cache.get(symbol)
             # check if cache data expired
             elapsed_days = get_time_diff(update_date)
-            logger.info('%s %s from cache: avg_vol=%d today_vol=%d cache_date=%s elapsed=%d'
+            logger.debug('%s %s from cache: avg_vol=%d today_vol=%d cache_date=%s elapsed=%d'
                     % (get_time_log(), symbol, option_info['vol_3mon'], option_info['vol_today'], update_date, elapsed_days))
             if avg_only:
                 if elapsed_days < OptionVolumeCache.expire_threshold:
@@ -46,7 +46,7 @@ class OptionVolumeCache:
         self.__cache.dump()
 
     def close(self):
-        logger.info('%s dump cache data to persistent storage', get_time_log())
+        logger.info('%s dump volume cache data to persistent storage', get_time_log())
         self.__cache.dump()
 
 if __name__ == '__main__':
@@ -54,7 +54,7 @@ if __name__ == '__main__':
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
-    logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
+    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
     option_volume_cache = OptionVolumeCache()
     (found, option_volume_info) = option_volume_cache.lookup('BABA', avg_only=False)

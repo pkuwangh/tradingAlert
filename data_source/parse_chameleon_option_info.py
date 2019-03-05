@@ -12,14 +12,14 @@ from utils.datetime_string import *
 from data_source.get_web_element import ChromeDriver
 
 def scan_option_breakdown(symbol, option_total_table, option_info):
-    #logger.info('%s lookup %s option volume breakdown' % (get_time_log(), symbol))
+    logger.debug('%s lookup %s option volume breakdown' % (get_time_log(), symbol))
     status_bad = False
     all_found = True
     return all_found
 
 
 def scan_option_volume(symbol, option_total_table, option_info):
-    #logger.info('%s lookup %s option volume summary' % (get_time_log(), symbol))
+    logger.debug('%s lookup %s option volume summary' % (get_time_log(), symbol))
     status_bad = False
     started = False
     for line in option_total_table:
@@ -80,7 +80,7 @@ def lookup_option_breakdown(symbol, save_file=False, folder='logs'):
         filename = os.path.join(meta_data_dir, symbol + '_putcall_' + today_date_str + '.txt')
         with open(filename, 'w') as fout:
             fout.write(web_data)
-        logger.info('%s save %s option breakdown to %s' % (get_time_log(), symbol, filename))
+        logger.debug('%s save %s option breakdown to %s' % (get_time_log(), symbol, filename))
     return (found, option_info)
 
 
@@ -117,7 +117,7 @@ def lookup_option_volume(symbol, save_file=False, folder='logs'):
         filename = os.path.join(meta_data_dir, symbol + '_option_' + today_date_str + '.txt')
         with open(filename, 'w') as fout:
             fout.write(web_data)
-        logger.info('%s save %s option volume to %s' % (get_time_log(), symbol, filename))
+        logger.debug('%s save %s option volume to %s' % (get_time_log(), symbol, filename))
     return (found, option_info)
 
 
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
-    logging.basicConfig(level=logging.INFO, filename=log_file, filemode='a')
+    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
 #    (found, option_callput_info) = lookup_option_breakdown('NVDA', save_file=True)
 #    print ('%s call_vol=%d put_vol=%d call_oi=%d put_oi=%d' %

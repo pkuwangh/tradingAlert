@@ -34,7 +34,7 @@ class ChromeDriver:
                     logger.info('finally succeed after retrying %d times' % (num_retry))
                 break
             except Exception as e:
-                logger.error('error when init driver (num_retry=%d): %s' % (num_retry, e))
+                logger.warning('error when init driver: %s (retry=%d)' % (e, num_retry))
                 time.sleep(10)
                 num_retry += 1
                 continue
@@ -42,8 +42,7 @@ class ChromeDriver:
             raise
 
     def download_data(self, url, button_css_sel=None, element_id=None, element_class_name=None, outfile=None):
-        logger.info('%s download data from %s'
-                % (get_time_log(), url))
+        logger.info('%s download data from %s' % (get_time_log(), url))
         num_retry = 0
         element = None
         while num_retry < 8:
@@ -52,8 +51,8 @@ class ChromeDriver:
             try:
                 self.driver.get(url)
             except Exception as e:
-                logger.error('error when accessing url=%s: %s'
-                        % (url, e))
+                logger.warning('error when accessing url=%s: %s (retry=%d)'
+                        % (url, e, num_retry))
                 time.sleep(10)
                 continue
             time.sleep(5*random.random())
@@ -62,8 +61,8 @@ class ChromeDriver:
                 try:
                     button = self.driver.find_element_by_css_selector(button_css_sel).click()
                 except Exception as e:
-                    logger.error('error when getting button=%s: %s'
-                            % (button_css_sel, e))
+                    logger.warning('error when getting button=%s: %s (retry=%d)'
+                            % (button_css_sel, e, num_retry))
                     if num_retry < 4:
                         time.sleep(10)
                         continue
@@ -72,16 +71,16 @@ class ChromeDriver:
                 try:
                     element = self.driver.find_element_by_id(element_id)
                 except Exception as e:
-                    logger.error('error when getting element=%s: %s'
-                            % (element_id, e))
+                    logger.warning('error when getting element=%s: %s (retry=%d)'
+                            % (element_id, e, num_retry))
                     time.sleep(10)
                     continue
             elif element_class_name:
                 try:
                     element = self.driver.find_element_by_class_name(element_class_name)
                 except Exception as e:
-                    logger.error('error when getting class=%s: %s'
-                            % (element_class_name, e))
+                    logger.warning('error when getting class=%s: %s (retry=%d)'
+                            % (element_class_name, e, num_retry))
                     time.sleep(10)
                     continue
             else:
@@ -90,7 +89,7 @@ class ChromeDriver:
             if element and element.text:
                 break
             else:
-                logger.error('did not get the element? retry=%u', num_retry)
+                logger.warning('did not get the element? (retry=%u)' % (num_retry))
                 time.sleep(30)
                 continue
         # output & return
@@ -100,6 +99,7 @@ class ChromeDriver:
                     fout.write(element.text)
             return element.text
         else:
+            logger.error('%s failed to get element from %s' % (get_time_log(), url))
             raise
 
     def close(self):
@@ -114,7 +114,7 @@ if __name__ == '__main__':
         os.makedirs(temp_dir)
     log_file = os.path.join(temp_dir, 'log.' + __name__)
     import sys
-    logging.basicConfig(level=logging.INFO, filename=log_file, filemode='w')
+    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='w')
     logging.getLogger().addHandler(logging.StreamHandler())
     # create chrome driver
     chrome_driver = ChromeDriver(height=3240)
