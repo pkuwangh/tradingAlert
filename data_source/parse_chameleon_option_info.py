@@ -12,14 +12,14 @@ from utils.datetime_string import *
 from data_source.get_web_element import ChromeDriver
 
 def scan_option_breakdown(symbol, option_total_table, option_info):
-    logger.info('%s lookup %s option volume breakdown' % (get_time_log(), symbol))
+    #logger.info('%s lookup %s option volume breakdown' % (get_time_log(), symbol))
     status_bad = False
     all_found = True
     return all_found
 
 
 def scan_option_volume(symbol, option_total_table, option_info):
-    logger.info('%s lookup %s option volume summary' % (get_time_log(), symbol))
+    #logger.info('%s lookup %s option volume summary' % (get_time_log(), symbol))
     status_bad = False
     started = False
     for line in option_total_table:

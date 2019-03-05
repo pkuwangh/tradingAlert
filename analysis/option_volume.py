@@ -11,13 +11,13 @@ sys.path.append(root_dir)
 from utils.datetime_string import *
 
 class OptionVolumeCache:
-    expire_threshold = 90   # in days
+    expire_threshold = 30   # in days
     def __init__(self, filename=None, init_dump=False):
         if filename is None:
-            filename = os.path.join(root_dir, 'records', 'avg_option_volume.db')
+            filename = os.path.join(root_dir, 'records', 'cache', 'avg_option_volume.db')
         self.__cache = pickledb.load(filename, auto_dump=init_dump)
 
-    def lookup(self, symbol, avg_only):
+    def lookup(self, symbol, avg_only, folder='records'):
         hit = self.__cache.exists(symbol)
         logger.info('%s lookup option volume info for %s: cache-hit=%d' % (get_time_log(), symbol, hit))
         # lookup the cache
@@ -36,11 +36,14 @@ class OptionVolumeCache:
                     return (True, option_info)
         # lookup from web
         from data_source.parse_chameleon_option_info import lookup_option_volume
-        (found, option_info) = lookup_option_volume(symbol, save_file=True, folder='records')
+        (found, option_info) = lookup_option_volume(symbol, save_file=True, folder=folder)
         if found:
             # install into the cache
             self.__cache.set(symbol, (option_info, get_date_str()))
         return (found, option_info)
+
+    def dump(self):
+        self.__cache.dump()
 
     def close(self):
         logger.info('%s dump cache data to persistent storage', get_time_log())

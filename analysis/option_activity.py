@@ -35,20 +35,25 @@ class OptionActivity:
         for k in OptionActivity.__keys:
             self.__values[k] = None
 
+    def __lt__(self, other):
+        return self.__values['symbol'] < other.__values['symbol']
+
     def get_display_str(self):
-        return '%-4s %-4s %.1f->%.1f exp=%s vol/oi=%.0f cost=%.1fM ext=%.2fM days=%d vol=%.1fK date=%s' % \
+        return '%-4s %-4s %.1f->%.1f exp=%s vol/oi=%.0f cost=%.1fM ext=%.2fM days=%d date=%s vol=%.1fK' % \
                 (self.__peek('symbol', is_str=True), self.__peek('option_type', is_str=True),
                         self.__peek('ref_price'), self.__peek('strike_price'),
                         self.__peek('exp_date', is_str=True),
                         self.__peek('vol_oi'),
-                        self.__peek('total_cost'), self.__peek('ext_value'),
+                        self.__peek('total_cost')/1e3,
+                        self.__peek('ext_value')/1e3,
                         self.__peek('day_to_exp'),
-                        self.__peek('volume')/1000,
-                        self.__peek('deal_time', is_str=True))
+                        self.__peek('deal_time', is_str=True),
+                        self.__peek('volume')/1000)
 
     def get_ext_display_str(self):
-        return get_display_str() + ' tot_vol=%.1fK avg_vol=%.1fK' % \
-                (self.__peek('option_volume'), self.__peek('avg_option_volume'))
+        return self.get_display_str() + ' tot_vol=%.1fK avg_vol=%.1fK vol/avg=%.1f' % \
+                (self.__peek('option_volume')/1000, self.__peek('avg_option_volume')/1000,
+                 self.__peek('volume')/(self.__peek('avg_option_volume')+0.1))
 
     def get_signature(self):
         if not self.__inited:
