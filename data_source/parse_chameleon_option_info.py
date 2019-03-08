@@ -5,6 +5,7 @@ import sys
 import datetime
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
@@ -115,7 +116,7 @@ def lookup_option_volume(symbol, save_file=False, folder='logs'):
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
         today_date_str = get_date_str(datetime.datetime.today())
-        filename = os.path.join(meta_data_dir, symbol + '_option_' + today_date_str + '.txt')
+        filename = os.path.join(meta_data_dir, symbol + '_option_' + today_date_str + '.txt.gz')
         with openw(filename, 'wt') as fout:
             fout.write(web_data)
         logger.debug('%s save %s option volume to %s' % (get_time_log(), symbol, filename))
@@ -127,7 +128,7 @@ if __name__ == '__main__':
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
-    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='a')
+    logging.basicConfig(filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
 #    (found, option_callput_info) = lookup_option_breakdown('NVDA', save_file=True)
 #    print ('%s call_vol=%d put_vol=%d call_oi=%d put_oi=%d' %

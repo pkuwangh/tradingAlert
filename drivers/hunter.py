@@ -4,6 +4,7 @@ import os
 import sys
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
@@ -38,7 +39,6 @@ def filter_base(new_option_activity, option_volume_cache):
     # volume/average volume: volume spike ?
     volume_folder = 'records/raw_option_volume'
     (found, option_info) = option_volume_cache.lookup(symbol=new_option_activity.get('symbol'), avg_only=True, folder=volume_folder)
-    option_volume_cache.dump()
     if found:
         if new_option_activity.get('volume') < option_info['vol_3mon'] * thd_vol_spike:
             return False
@@ -97,10 +97,10 @@ def hunt():
     # pull option activity list
     from data_source.parse_barchart_activity import get_option_activity
     from analysis.option_activity import OptionActivity
-#    option_activity_list = get_option_activity(save_file=True, folder='records/raw_option_activity')
-    infile = os.path.join(root_dir, 'records', 'raw_option_activity', 'OA_190304_181736.txt.gz')
-    fin = openw(infile, 'rt')
-    option_activity_list = fin.readlines()
+    option_activity_list = get_option_activity(save_file=True, folder='records/raw_option_activity')
+#    infile = os.path.join(root_dir, 'records', 'raw_option_activity', 'OA_190305_230220.txt.gz')
+#    fin = openw(infile, 'rt')
+#    option_activity_list = fin.readlines()
     # look into each one
     filtered_list = []
     for line in option_activity_list:
@@ -121,7 +121,7 @@ if __name__ == '__main__':
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
-    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='a')
+    logging.basicConfig(filename=log_file, filemode='a')
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
     logging.getLogger().addHandler(stream_handler)

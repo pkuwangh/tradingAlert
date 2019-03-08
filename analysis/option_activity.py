@@ -4,6 +4,7 @@ import os
 import sys
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
@@ -160,7 +161,7 @@ if __name__ == '__main__':
     if not os.path.exists(meta_data_dir):
         os.makedirs(meta_data_dir)
     log_file = os.path.join(meta_data_dir, 'log.' + __name__)
-    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='a')
+    logging.basicConfig(filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
     # test from local copy
 #    from data_source.parse_barchart_activity import parse_option_activity

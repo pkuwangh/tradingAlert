@@ -114,6 +114,8 @@ venv.bak/
 /records/raw_option_volume/*.txt.gz
 /records/option_activity_live/*.txt
 /records/option_activity_live/*.txt.gz
+/records/option_activity_dead/*.txt
+/records/option_activity_dead/*.txt.gz
 /records/option_activity_success/*.txt
 /records/option_activity_success/*.txt.gz
 /records/option_activity_failure/*.txt

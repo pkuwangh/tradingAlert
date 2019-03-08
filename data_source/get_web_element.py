@@ -9,6 +9,7 @@ import time
 import random
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
@@ -115,7 +116,7 @@ if __name__ == '__main__':
         os.makedirs(temp_dir)
     log_file = os.path.join(temp_dir, 'log.' + __name__)
     import sys
-    logging.basicConfig(level=logging.DEBUG, filename=log_file, filemode='w')
+    logging.basicConfig(filename=log_file, filemode='w')
     logging.getLogger().addHandler(logging.StreamHandler())
     # create chrome driver
     chrome_driver = ChromeDriver(height=3240)
