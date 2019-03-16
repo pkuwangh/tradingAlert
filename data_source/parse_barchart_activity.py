@@ -33,7 +33,8 @@ def scan_option_activity(raw_data):
         else:
             if 'Last Volume Open Int' in line:
                 main_table_started = True 
-    option_activity_list.append(new_activity)
+    if new_activity:
+        option_activity_list.append(new_activity)
     return option_activity_list
 
 def parse_option_activity(infile):
@@ -53,7 +54,8 @@ def lookup_option_activity():
     show_all = 'a.show-all.ng-scope'
     try:
         chrome_driver = ChromeDriver(height=1080)
-        web_data = chrome_driver.download_data(url=url, button_css_sel=show_all, element_id=eid)
+        outfile = os.path.join(root_dir, 'logs', 'data_option_activity.txt')
+        web_data = chrome_driver.download_data(url=url, button_css_sel=show_all, element_id=eid, outfile=outfile)
     except:
         web_data = None
     try:
@@ -61,7 +63,10 @@ def lookup_option_activity():
     except:
         pass
     # lookup
-    return scan_option_activity(web_data.splitlines())
+    if web_data:
+        return scan_option_activity(web_data.splitlines())
+    else:
+        return []
 
 def get_option_activity(save_file=False, folder='logs'):
     option_activity_list = lookup_option_activity()

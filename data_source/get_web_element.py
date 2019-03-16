@@ -10,6 +10,7 @@ import random
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.DEBUG)
 
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
@@ -88,10 +89,14 @@ class ChromeDriver:
             else:
                 logger.error('Do not know how to find element')
             # done if found element
-            if element and element.text:
+            if element and element.text and len(element.text) > 1:
                 break
             else:
-                logger.warning('did not get the element? (retry=%u)' % (num_retry))
+                logger.warning('did not get the proper element? element=%d text=%d len(text)=%d (retry=%u)' %
+                        (1 if element else 0),
+                        (1 if element and element.text else 0),
+                        (len(element.text) if element and element.text else 0),
+                        (num_retry))
                 time.sleep(30)
                 continue
         # output & return
