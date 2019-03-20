@@ -2,6 +2,8 @@
 
 import os
 import sys
+import time
+import random
 import datetime
 import logging
 from math import floor
@@ -69,7 +71,19 @@ def lookup_option_activity():
         return []
 
 def get_option_activity(save_file=False, folder='logs'):
-    option_activity_list = lookup_option_activity()
+    num_retry = 0
+    retry_timeout = 4
+    while num_retry < retry_timeout:
+        option_activity_list = lookup_option_activity()
+        if len(option_activity_list) > 0:
+            logger.info('retrieved option activity list: # items=%d'
+                    % (len(option_activity_list)))
+            break
+        else:
+            logger.warning('option activity list empty? retry=%d' % (num_retry))
+            num_retry += 1
+            time.sleep(10*random.random())
+            continue
     # save a copy
     if save_file:
         file_dir = os.path.abspath(os.path.dirname(__file__))

@@ -69,6 +69,7 @@ class ChromeDriver:
                     if num_retry < 4:
                         time.sleep(10)
                         continue
+            time.sleep(5*random.random())
             # get the target element
             if element_id:
                 try:
