@@ -37,23 +37,25 @@ class OptionActivity:
         for k in OptionActivity.__keys:
             self.__values[k] = None
 
+    def is_inited(self):
+        return self.__inited
+
     def __lt__(self, other):
         return self.__values['symbol'] < other.__values['symbol']
 
     def get_display_str(self):
-        return '%-4s %-4s %.1f->%.1f exp=%s vol/oi=%.0f cost=%.1fM ext=%.2fM days=%d date=%s vol=%.1fK' % \
+        return '%-4s %-4s %s->%s %5.1f->%5.1f vol/oi=%-2.0f cost=%.1fM ext=%.1fM days=%-2d vol(k)=%-4.1f' % \
                 (self.__peek('symbol', is_str=True), self.__peek('option_type', is_str=True),
+                        self.__peek('deal_time', is_str=True), self.__peek('exp_date', is_str=True),
                         self.__peek('ref_price'), self.__peek('strike_price'),
-                        self.__peek('exp_date', is_str=True),
                         self.__peek('vol_oi'),
                         self.__peek('total_cost')/1e3,
                         self.__peek('ext_value')/1e3,
                         self.__peek('day_to_exp'),
-                        self.__peek('deal_time', is_str=True),
                         self.__peek('volume')/1000)
 
     def get_ext_display_str(self):
-        return self.get_display_str() + ' tot_vol=%.1fK avg_vol=%.1fK vol/avg=%.1f' % \
+        return self.get_display_str() + ' tot_vol=%-4.1f avg_vol=%-4.1f vol/avg=%-4.1f' % \
                 (self.__peek('option_volume')/1000, self.__peek('avg_option_volume')/1000,
                  self.__peek('volume')/(self.__peek('avg_option_volume')+0.1))
 
@@ -137,13 +139,22 @@ class OptionActivity:
         except Exception as e:
             logger.error('error processing %s: %s' % (option_activity_str.rstrip(), e))
 
-    def from_json_entry(self, json_filename, json_dict):
-        for k in json_dict:
-            try:
-                self.__set(k, json_dict[k])
-            except Exception as e:
-                logger.error('error processing %s from %s: %s' % (k, json_filename, e))
-        self.__inited = True
+    def from_json_file(self, filename):
+        import json
+        try:
+            with openw(filename, 'rt') as fp:
+                json_dict = json.load(fp)
+            for k in json_dict:
+                try:
+                    self.__set(k, json_dict[k])
+                except Exception as e:
+                    logger.error('error setting %s from %s: %s' % (k, filename, e))
+            self.__inited = True
+        except Exception as e:
+            logger.error('error processing %s: %s' % (filename, e))
+
+    def unserialize(self, filename):
+        self.from_json_file(filename)
 
     def serialize(self, folder='records'):
         file_dir = os.path.abspath(os.path.dirname(__file__))
@@ -151,7 +162,7 @@ class OptionActivity:
         meta_data_dir = os.path.join(root_dir, folder)
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
-        filename = os.path.join(meta_data_dir, self.get_signature() + '.txt.gz')
+        filename = os.path.join(meta_data_dir, self.get_signature()+'.txt.gz')
         import json
         with openw(filename, 'wt') as fp:
             json.dump(self.__values, fp, indent=4)

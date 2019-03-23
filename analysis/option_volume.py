@@ -37,7 +37,7 @@ class OptionVolumeCache:
                     return (True, option_info)
         # lookup from web
         from data_source.parse_chameleon_option_info import lookup_option_volume
-        (found, option_info) = lookup_option_volume(symbol, save_file=True, folder=folder)
+        (found, option_info) = lookup_option_volume(symbol, save_file=False, folder=folder)
         if found:
             # install into the cache
             self.__cache.set(symbol, (option_info, get_date_str()))
