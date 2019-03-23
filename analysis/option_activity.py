@@ -163,6 +163,8 @@ class OptionActivity:
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
         filename = os.path.join(meta_data_dir, self.get_signature()+'.txt.gz')
+        logger.info('%s save %4s option activity to %s'
+                % (get_time_log(), self.get('symbol'), filename))
         import json
         with openw(filename, 'wt') as fp:
             json.dump(self.__values, fp, indent=4)

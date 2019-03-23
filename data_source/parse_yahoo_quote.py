@@ -17,7 +17,8 @@ def scan_quote_summary(symbol, quote_summary_table):
     quote_info = {}
     logger.debug('%s lookup %s quote summary' % (get_time_log(), symbol))
     quote_info['market_cap'] = -1
-    quote_info['open_price'] = -1
+    quote_info['price_high'] = -1
+    quote_info['price_low'] = -1
     quote_info['avg_volume'] = -1
     quote_info['volume']     = -1
     status_bad = False
@@ -39,9 +40,10 @@ def scan_quote_summary(symbol, quote_summary_table):
                 quote_info['market_cap'] = value
             except:
                 status_bad = True
-        elif 'Open' in line:
+        elif 'Range' in line and 'Day' in line:
             try:
-                quote_info['open_price'] = float(items[-1].replace(',', ''))
+                quote_info['price_high'] = float(items[-1].replace(',', ''))
+                quote_info['price_low'] = float(items[-3].replace(',', ''))
             except:
                 status_bad = True
         elif 'Avg. Volume' in line:
@@ -55,9 +57,9 @@ def scan_quote_summary(symbol, quote_summary_table):
             except:
                 status_bad = True
     if status_bad:
-        logger.error('%s error scanning %s quote; resulting cap=%d open=%d avg_vol=%d vol=%d\n'
+        logger.error('%s error scanning %s quote; resulting cap=%d high=%d low=%d avg_vol=%d vol=%d\n'
                 % (get_time_log(), symbol,
-                    quote_info['market_cap'], quote_info['open_price'],
+                    quote_info['market_cap'], quote_info['price_high'], quote_info['price_low'],
                     quote_info['avg_volume'], quote_info['volume']))
     all_found = (min(quote_info.values()) >= 0)
     return (all_found, quote_info)
@@ -104,9 +106,10 @@ if __name__ == '__main__':
     logging.basicConfig(filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
     (found, quote_info) = lookup_quote_summary('NVDA', save_file=True)
-    print ('%s market_cap=%d open_price=%d avg_volume=%d volume=%d'
+    print ('%s market_cap=%d price_high=%.1f price_low=%.1f avg_volume=%d volume=%d'
             % ('NVDA',
                 quote_info['market_cap'],
-                quote_info['open_price'],
+                quote_info['price_high'],
+                quote_info['price_low'],
                 quote_info['avg_volume'],
                 quote_info['volume']))
