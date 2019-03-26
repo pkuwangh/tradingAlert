@@ -90,7 +90,7 @@ def filter(new_option_activity, option_volume_cache):
 
 def hunt():
     logger.info('================================================================')
-    logger.info('%s the hunter started! Hunt or to be hunted!', get_time_log());
+    logger.info('%s the hunter started! Hunt or to be hunted!' % (get_time_log()))
     # init volume cache
     from analysis.option_volume import OptionVolumeCache
     option_volume_cache = OptionVolumeCache(filename=os.path.join(root_dir, 'records', 'cache', 'option_volume.db'))

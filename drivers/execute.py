@@ -22,6 +22,7 @@ def execute():
     text = ''
     for item in hunted_list:
         text += (item.get_ext_display_str() + '\n')
+    text += '\n'
     mail_man.send(subject=subject, content=text)
 
 

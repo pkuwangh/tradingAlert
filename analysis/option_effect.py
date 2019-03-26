@@ -28,6 +28,9 @@ class OptionEffect:
             self.__values['price_init'] = option_activity.get('ref_price')
             self.__values['oi_inject'] = False
 
+    def get_days(self):
+        return get_time_diff(get_date_str(), self.get('exp_date'))
+
     def get_display_str(self):
         display_str = self.get('display_str')
         for date_str in self.__values['effect'].keys():
@@ -61,6 +64,9 @@ class OptionEffect:
         logger.info('track changes in OI & price for %s' % (symbol))
         from data_source.parse_yahoo_option import lookup_option_chain_info
         from data_source.parse_yahoo_quote  import lookup_quote_summary
+        price_change = False
+        oi_change = False
+        is_show = False
         # 1. lookup oi change
         (found1, oi) = lookup_option_chain_info(
                 symbol, get_date(exp_date),
@@ -68,8 +74,6 @@ class OptionEffect:
                 save_file=True, folder=folder)
         if found1:
             # 2. lookup price change
-            price_change = False
-            oi_change = False
             (found2, quote_info) = lookup_quote_summary(
                     symbol, save_file=True, folder=folder)
             if found2:
@@ -77,6 +81,7 @@ class OptionEffect:
                 else: price = quote_info['price_low']
                 l_show = False
                 # compare w/ last record
+                # TODO: we may want to check whether it's same day
                 if len(self.__values['effect']) > 0:
                     last_key = list(self.__values['effect'].keys())[-1]
                     (l_oi, l_price, l_show) = self.__values['effect'][last_key]
