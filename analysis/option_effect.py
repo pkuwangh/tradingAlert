@@ -61,12 +61,19 @@ class OptionEffect:
     def track_change(self, folder='logs'):
         exp_date = self.get('exp_date')
         symbol = self.get('symbol')
-        logger.info('track changes in OI & price for %s' % (symbol))
+        logger.info('%s track changes in OI & price for %s' % (get_time_log(), symbol))
+        num_days = self.get_days()
+        if num_days < 0:
+            # TODO: we may want to handle this outside
+            logger.info('%s expired!' % (self.get('signature')))
+            return (False, False, False)
         from data_source.parse_yahoo_option import lookup_option_chain_info
         from data_source.parse_yahoo_quote  import lookup_quote_summary
         price_change = False
         oi_change = False
         is_show = False
+        # handle the case we already called track today
+        self.__values['effect'].pop(get_date_str(), None)
         # 1. lookup oi change
         (found1, oi) = lookup_option_chain_info(
                 symbol, get_date(exp_date),
@@ -81,7 +88,6 @@ class OptionEffect:
                 else: price = quote_info['price_low']
                 l_show = False
                 # compare w/ last record
-                # TODO: we may want to check whether it's same day
                 if len(self.__values['effect']) > 0:
                     last_key = list(self.__values['effect'].keys())[-1]
                     (l_oi, l_price, l_show) = self.__values['effect'][last_key]

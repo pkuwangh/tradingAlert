@@ -19,7 +19,7 @@ def track():
     from analysis.option_effect   import OptionEffectFactory
     from analysis.option_effect   import OptionEffect
     live_activity_dir = os.path.join(root_dir, 'records', 'option_activity_live')
-    send_notification = False
+    notify_list = []
     for item in os.listdir(live_activity_dir):
         if item.startswith('Act'):
             src_file = os.path.join(live_activity_dir, item)
@@ -31,8 +31,8 @@ def track():
                 option_effect.serialize(OptionEffectFactory.folder)
                 num_days = option_effect.get_days()
                 if price_change or oi_change or num_days%7 == 0 or num_days < 4:
-                    send_notification = True
-                print (option_effect.get_display_str())
+                    notify_list.append(option_effect)
+    return notify_list
 
 
 if __name__ == '__main__':
@@ -44,4 +44,6 @@ if __name__ == '__main__':
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
     logging.getLogger().addHandler(stream_handler)
-    track()
+    notify_list = track()
+    for item in notify_list:
+        print (item.get_display_str())

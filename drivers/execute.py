@@ -12,6 +12,9 @@ from utils.datetime_string import *
 from utils.file_rdwr import *
 
 def execute():
+    # track past unusual activity
+    from drivers.tracker import track
+    notify_list = track()
     # hunt for unusual activity
     from drivers.hunter import hunt
     hunted_list = hunt()
@@ -19,10 +22,14 @@ def execute():
     from utils.send_email import MailMan
     mail_man = MailMan()
     subject = 'Option activity on %s' % (get_datetime_str())
-    text = ''
+    text = "======== Today's Unusual Option Activity ========\n"
     for item in hunted_list:
-        text += (item.get_ext_display_str() + '\n')
-    text += '\n'
+        text += (item.get_ext_display_str() + "\n")
+    text += "\n"
+    text = "======== Past Option Activity ========\n"
+    for item in notify_list:
+        text += (item.get_display_str() + "\n")
+    text += "\n"
     mail_man.send(subject=subject, content=text)
 
 
