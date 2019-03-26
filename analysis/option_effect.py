@@ -26,6 +26,23 @@ class OptionEffect:
             self.__values['display_str'] = option_activity.get_ext_display_str()
             self.__values['oi_init'] = option_activity.get('volume') / option_activity.get('vol_oi')
             self.__values['price_init'] = option_activity.get('ref_price')
+            self.__values['oi_inject'] = False
+
+    def get_display_str(self):
+        display_str = self.get('display_str')
+        for date_str in self.__values['effect'].keys():
+            v = self.__values['effect'][date_str]
+            oi = v[0]
+            price = v[1]
+            oi_diff = oi / self.get('oi_init')
+            price_diff = 100 * (price / self.get('price_init') - 1)
+            if v[2]:
+                display_str += ('\n\t%s: oi=%d (%.1fX) price=%.1f (%s%.1f%%) days=%d'
+                        % (date_str,
+                            oi, oi_diff,
+                            price, ('+' if price_diff >= 0 else ''), price_diff,
+                            get_time_diff(date_str, self.get('exp_date'))))
+        return display_str
 
     def get(self, key):
         if key not in self.__values: raise
@@ -51,20 +68,42 @@ class OptionEffect:
                 save_file=True, folder=folder)
         if found1:
             # 2. lookup price change
+            price_change = False
+            oi_change = False
             (found2, quote_info) = lookup_quote_summary(
-                    symbol,
-                    save_file=True, folder=folder)
+                    symbol, save_file=True, folder=folder)
             if found2:
                 if self.get('option_type') == 'C': price = quote_info['price_high']
                 else: price = quote_info['price_low']
-                self.__values['effect'][exp_date] = (oi, price)
+                l_show = False
+                # compare w/ last record
+                if len(self.__values['effect']) > 0:
+                    last_key = list(self.__values['effect'].keys())[-1]
+                    (l_oi, l_price, l_show) = self.__values['effect'][last_key]
+                    if oi/l_oi > 1.2 or oi/l_oi < 0.8:
+                        is_show = True
+                    if price/l_price > 1.05 or price/l_price < 0.95:
+                        is_show = True
+                else:
+                    is_show = True
+                # compare w/ init record
+                if price/self.get('price_init') > 1.1 or \
+                        price/self.get('price_init') < 0.9:
+                    price_change = True
+                if (not self.get('oi_inject') and \
+                        oi > self.get('oi_init')) and \
+                        (oi - self.get('oi_init')) / self.get('volume') > 0.5:
+                    oi_change = True
+                if (not l_show) and (price_change or oi_change):
+                    is_show = True
+                self.__values['effect'][get_date_str()] = (oi, price, is_show)
             else:
                 logger.error('%s error quote for %s not found'
                         % (get_time_log(), symbol))
         else:
             logger.error('%s error OI for %s exp=%s not found'
                     % (get_time_log(), symbol, exp_date))
-        return (found1 and found2)
+        return (found1 and found2, price_change, oi_change)
 
     def unserialize(self, filename):
         import json
@@ -125,13 +164,20 @@ if __name__ == '__main__':
 
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--infile', '-f', action='store', required=True,
+    parser.add_argument('--infile', '-f', nargs='+', required=True,
             help='option activity files to display')
 
     args = parser.parse_args()
-    option_activity = OptionActivity()
-    option_activity.unserialize(args.infile)
-    option_effect = OptionEffectFactory.create(option_activity)
-    option_effect.track_change()
-    option_effect.serialize(OptionEffectFactory.folder)
+    for item in args.infile:
+        option_activity = OptionActivity()
+        option_activity.unserialize(item)
+        option_effect = OptionEffectFactory.create(option_activity)
+        (found, price_change, oi_change) = option_effect.track_change()
+        option_effect.serialize(OptionEffectFactory.folder)
+        if found and price_change:
+            print ('Price change over 10%: %s'
+                    % (option_effect.get('symbol')))
+        if found and oi_change:
+            print ('OI change over 50% volume: %s'
+                    % (option-effect.get('symbol')))
 

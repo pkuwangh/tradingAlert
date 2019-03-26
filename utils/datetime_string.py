@@ -2,10 +2,17 @@
 
 import datetime
 
-def get_time_diff(date_str):
-    if len(date_str) == 6 and date_str.isdigit():
-        ref_date = datetime.datetime.strptime(date_str, '%y%m%d')
-        delta = datetime.datetime.now() - ref_date
+def get_time_diff(ref_date_str, date_str=None):
+    if len(ref_date_str) == 6 and ref_date_str.isdigit():
+        if date_str is not None:
+            if len(date_str) == 6 and date_str.isdigit():
+                target_date = datetime.datetime.strptime(date_str, '%y%m%d')
+            else:
+                return 99999
+        else:
+            target_date = datetime.datetime.now()
+        ref_date = datetime.datetime.strptime(ref_date_str, '%y%m%d')
+        delta = target_date.date() - ref_date.date()
         return delta.days
     return 99999
 
