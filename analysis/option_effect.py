@@ -19,6 +19,7 @@ class OptionEffect:
         if option_activity:
             self.__values['symbol'] = option_activity.get('symbol')
             self.__values['exp_date'] = option_activity.get('exp_date')
+            self.__values['deal_time'] = option_activity.get('deal_time')
             self.__values['option_type'] = 'C' if 'Call' in option_activity.get('option_type') else 'P'
             self.__values['strike_price'] = option_activity.get('strike_price')
             self.__values['volume'] = option_activity.get('volume')
@@ -28,8 +29,11 @@ class OptionEffect:
             self.__values['price_init'] = option_activity.get('ref_price')
             self.__values['oi_inject'] = False
 
-    def get_days(self):
+    def get_remaining_days(self):
         return get_time_diff(get_date_str(), self.get('exp_date'))
+
+    def get_elapsed_days(self):
+        return get_time_diff(self.get('deal_time'), get_date_str())
 
     def get_display_str(self):
         display_str = self.get('display_str')
@@ -39,7 +43,7 @@ class OptionEffect:
             price = v[1]
             oi_diff = oi / self.get('oi_init')
             price_diff = 100 * (price / self.get('price_init') - 1)
-            if v[2]:
+            if v[2] or data_str == list(self.__values['effect'].keys())[-1]:
                 display_str += ('\n\t%s: oi=%d (%.1fX) price=%.1f (%s%.1f%%) days=%d'
                         % (date_str,
                             oi, oi_diff,
@@ -62,28 +66,27 @@ class OptionEffect:
         exp_date = self.get('exp_date')
         symbol = self.get('symbol')
         logger.info('%s track changes in OI & price for %s' % (get_time_log(), symbol))
-        num_days = self.get_days()
-        if num_days < 0:
-            # TODO: we may want to handle this outside
+        num_remaining_days = self.get_remaining_days()
+        if num_remaining_days < 0:
             logger.info('%s expired!' % (self.get('signature')))
             return (False, False, False)
         from data_source.parse_yahoo_option import lookup_option_chain_info
         from data_source.parse_yahoo_quote  import lookup_quote_summary
         price_change = False
         oi_change = False
-        is_show = False
         # handle the case we already called track today
         self.__values['effect'].pop(get_date_str(), None)
         # 1. lookup oi change
         (found1, oi) = lookup_option_chain_info(
                 symbol, get_date(exp_date),
                 self.get('option_type'), self.get('strike_price'),
-                save_file=True, folder=folder)
+                save_file=False, folder=folder)
         if found1:
             # 2. lookup price change
             (found2, quote_info) = lookup_quote_summary(
-                    symbol, save_file=True, folder=folder)
+                    symbol, save_file=False, folder=folder)
             if found2:
+                is_show = (num_remaining_days <= 1)
                 if self.get('option_type') == 'C': price = quote_info['price_high']
                 else: price = quote_info['price_low']
                 l_show = False
@@ -186,9 +189,9 @@ if __name__ == '__main__':
         (found, price_change, oi_change) = option_effect.track_change()
         option_effect.serialize(OptionEffectFactory.folder)
         if found and price_change:
-            print ('Price change over 10%: %s'
+            print ('Price change over 10%%: %s' \
                     % (option_effect.get('symbol')))
         if found and oi_change:
-            print ('OI change over 50% volume: %s'
-                    % (option-effect.get('symbol')))
+            print ('OI change over 50%% volume : %s' \
+                    % (option_effect.get('symbol')))
 
