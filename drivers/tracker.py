@@ -28,7 +28,6 @@ def track_group(activity_dir, force_notify=False):
                         % (get_time_log(), option_activity.get_basic_display_str()))
                 continue
             (found, price_change, oi_change) = option_effect.track_change()
-            option_effect.serialize(OptionEffectFactory.folder)
             if found:
                 option_effect.serialize(OptionEffectFactory.folder)
                 num_days = option_effect.get_remaining_days()

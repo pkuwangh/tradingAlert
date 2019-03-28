@@ -11,17 +11,14 @@ sys.path.append(root_dir)
 from utils.datetime_string import *
 from utils.file_rdwr import *
 
-def execute():
+def execute(send_out=False):
     # track past unusual activity
     from drivers.tracker import track
     (hold_list, live_list) = track()
     # hunt for unusual activity
     from drivers.hunter import hunt
     hunted_list = hunt()
-    # send email to my beloved followers
-    from utils.send_email import MailMan
-    mail_man = MailMan()
-    subject = 'Option activity on %s' % (get_datetime_str())
+    # prepare output
     text = ""
     text += "======== Today's Unusual Option Activity (UOA) ========\n"
     for item in hunted_list:
@@ -36,7 +33,17 @@ def execute():
         text += (item.get_display_str() + "\n")
     text += "\n"
     print (text)
-    mail_man.send(subject=subject, content=text)
+    # send email to my beloved followers
+    send_now = send_out
+    if not send_now:
+        user_input = input('send above results to subscribers? (yes/no): ')
+        if 'yes' in user_input:
+            send_now = True
+    if send_now:
+        from utils.send_email import MailMan
+        mail_man = MailMan()
+        subject = 'Option activity on %s' % (get_datetime_str())
+        mail_man.send(subject=subject, content=text)
 
 
 if __name__ == '__main__':
@@ -48,6 +55,13 @@ if __name__ == '__main__':
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
     logging.getLogger().addHandler(stream_handler)
+
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--send-out', '-s', action='store_true',
+            help='send out result')
+
+    args = parser.parse_args()
     # execute all
-    execute()
+    execute(args.send_out)
 

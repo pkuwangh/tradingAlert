@@ -43,7 +43,7 @@ class OptionEffect:
             price = v[1]
             oi_diff = oi / self.get('oi_init')
             price_diff = 100 * (price / self.get('price_init') - 1)
-            if v[2] or data_str == list(self.__values['effect'].keys())[-1]:
+            if v[2] or date_str == list(self.__values['effect'].keys())[-1]:
                 display_str += ('\n\t%s: oi=%d (%.1fX) price=%.1f (%s%.1f%%) days=%d'
                         % (date_str,
                             oi, oi_diff,
