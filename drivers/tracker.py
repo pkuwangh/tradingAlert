@@ -33,6 +33,7 @@ def track_group(activity_dir, force_notify=False):
                 num_days = option_effect.get_remaining_days()
                 if price_change or oi_change or num_days%7 == 0 or num_days < 4 or force_notify:
                     notify_list.append(option_effect)
+    notify_list.sort()
     return notify_list
 
 def track():

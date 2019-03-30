@@ -29,6 +29,12 @@ class OptionEffect:
             self.__values['price_init'] = option_activity.get('ref_price')
             self.__values['oi_inject'] = False
 
+    def __lt__(self, other):
+        if self.get('option_type') == other.get('option_type'):
+            return self.get('exp_date') < other.get('exp_date')
+        else:
+            return self.get('option_type') == 'C'
+
     def get_remaining_days(self):
         return get_time_diff(get_date_str(), self.get('exp_date'))
 
@@ -44,11 +50,12 @@ class OptionEffect:
             oi_diff = oi / self.get('oi_init')
             price_diff = 100 * (price / self.get('price_init') - 1)
             if v[2] or date_str == list(self.__values['effect'].keys())[-1]:
-                display_str += ('\n\t%s: oi=%d (%.1fX) price=%.1f (%s%.1f%%) days=%d'
-                        % (date_str,
+                display_str += ('\n\t%s/%s: days=%2d oi=%d (%.1fX) price=%.1f (%s%.1f%%)'
+                        % (date_str[2:4], date_str[4:6],
+                            get_time_diff(date_str, self.get('exp_date')),
                             oi, oi_diff,
-                            price, ('+' if price_diff >= 0 else ''), price_diff,
-                            get_time_diff(date_str, self.get('exp_date'))))
+                            price,
+                            ('+' if price_diff >= 0 else ''), price_diff))
         return display_str
 
     def get(self, key):
@@ -96,17 +103,18 @@ class OptionEffect:
                     (l_oi, l_price, l_show) = self.__values['effect'][last_key]
                     if l_oi < 1 or oi/l_oi > 1.2 or oi/l_oi < 0.8:
                         is_show = True
-                    if price/l_price > 1.05 or price/l_price < 0.95:
+                    if price/l_price > 1.04 or price/l_price < 0.96:
                         is_show = True
                 else:
                     is_show = True
                 # compare w/ init record
-                if price/self.get('price_init') > 1.1 or \
-                        price/self.get('price_init') < 0.9:
+                if price/self.get('price_init') > 1.08 or \
+                        price/self.get('price_init') < 0.92:
                     price_change = True
                 if (not self.get('oi_inject') and \
                         oi > self.get('oi_init')) and \
                         (oi - self.get('oi_init')) / self.get('volume') > 0.5:
+                    self.__values['oi_inject'] = True
                     oi_change = True
                 if (not l_show) and (price_change or oi_change):
                     is_show = True

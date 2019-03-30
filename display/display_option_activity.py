@@ -11,16 +11,21 @@ sys.path.append(root_dir)
 from utils.datetime_string import *
 from utils.file_rdwr import *
 
-def print_option_activity(filename):
+def print_option_activity(fileset):
     from analysis.option_activity import OptionActivity
-    rel_filename = filename.split('/')[-1]
-    if rel_filename.startswith('Act'):
-        option_activity = OptionActivity()
-        try:
-            option_activity.unserialize(filename)
-            print (option_activity.get_ext_display_str())
-        except Exception as e:
-            logger.error('error displaying %s: %s' % (filename, e))
+    oa_list = []
+    for filename in fileset:
+        rel_filename = filename.split('/')[-1]
+        if rel_filename.startswith('Act'):
+            option_activity = OptionActivity()
+            try:
+                option_activity.unserialize(filename)
+                oa_list.append(option_activity)
+            except Exception as e:
+                logger.error('error displaying %s: %s' % (filename, e))
+    oa_list.sort()
+    for item in oa_list:
+        print (item.get_ext_display_str())
 
 if __name__ == '__main__':
     import argparse
@@ -29,6 +34,5 @@ if __name__ == '__main__':
             help='option activity files to display')
 
     args = parser.parse_args()
-    for item in args.infile:
-        print_option_activity(item)
+    print_option_activity(args.infile)
 
