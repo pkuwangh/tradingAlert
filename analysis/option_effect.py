@@ -94,7 +94,7 @@ class OptionEffect:
                 if len(self.__values['effect']) > 0:
                     last_key = list(self.__values['effect'].keys())[-1]
                     (l_oi, l_price, l_show) = self.__values['effect'][last_key]
-                    if oi/l_oi > 1.2 or oi/l_oi < 0.8:
+                    if l_oi < 1 or oi/l_oi > 1.2 or oi/l_oi < 0.8:
                         is_show = True
                     if price/l_price > 1.05 or price/l_price < 0.95:
                         is_show = True
@@ -150,11 +150,16 @@ class OptionEffect:
 class OptionEffectFactory:
     # class members
     folder = 'records/auto_track'
+    # locator
+    @classmethod
+    def get_record_file(cls, option_activity):
+        record_name = OptionEffect.calc_record_name(option_activity.get_signature())
+        return os.path.join(root_dir, cls.folder, record_name+'.txt.gz')
+
     # factory creator
     @classmethod
     def create(cls, option_activity):
-        record_name = OptionEffect.calc_record_name(option_activity.get_signature())
-        filename = os.path.join(root_dir, cls.folder, record_name+'.txt.gz')
+        filename = cls.get_record_file(option_activity)
         if os.path.exists(filename):
             # already being tracked
             option_effect = OptionEffect()

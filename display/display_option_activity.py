@@ -13,12 +13,14 @@ from utils.file_rdwr import *
 
 def print_option_activity(filename):
     from analysis.option_activity import OptionActivity
-    option_activity = OptionActivity()
-    try:
-        option_activity.unserialize(filename)
-        print (option_activity.get_ext_display_str())
-    except Exception as e:
-        logger.error('error displaying %s: %s' % (filename, e))
+    rel_filename = filename.split('/')[-1]
+    if rel_filename.startswith('Act'):
+        option_activity = OptionActivity()
+        try:
+            option_activity.unserialize(filename)
+            print (option_activity.get_ext_display_str())
+        except Exception as e:
+            logger.error('error displaying %s: %s' % (filename, e))
 
 if __name__ == '__main__':
     import argparse
