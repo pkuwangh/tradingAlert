@@ -17,23 +17,27 @@ class OptionEffect:
         self.__values = {}
         self.__values['effect'] = {}
         if option_activity:
-            self.__values['symbol'] = option_activity.get('symbol')
-            self.__values['exp_date'] = option_activity.get('exp_date')
-            self.__values['deal_time'] = option_activity.get('deal_time')
-            self.__values['option_type'] = 'C' if 'Call' in option_activity.get('option_type') else 'P'
-            self.__values['strike_price'] = option_activity.get('strike_price')
-            self.__values['volume'] = option_activity.get('volume')
-            self.__values['signature'] = option_activity.get_signature()
-            self.__values['display_str'] = option_activity.get_ext_display_str()
-            self.__values['oi_init'] = option_activity.get('volume') / option_activity.get('vol_oi')
-            self.__values['price_init'] = option_activity.get('ref_price')
-            self.__values['oi_inject'] = False
+            self.initialize(option_activity)
 
     def __lt__(self, other):
         if self.get('option_type') == other.get('option_type'):
             return self.get('exp_date') < other.get('exp_date')
         else:
             return self.get('option_type') == 'C'
+
+    def initialize(self, option_activity):
+        self.__values['symbol'] = option_activity.get('symbol')
+        self.__values['exp_date'] = option_activity.get('exp_date')
+        self.__values['deal_time'] = option_activity.get('deal_time')
+        self.__values['option_type'] = 'C' if 'Call' in option_activity.get('option_type') else 'P'
+        self.__values['strike_price'] = option_activity.get('strike_price')
+        self.__values['volume'] = option_activity.get('volume')
+        self.__values['signature'] = option_activity.get_signature()
+        self.__values['display_str'] = option_activity.get_ext_display_str()
+        self.__values['oi_init'] = option_activity.get('volume') / option_activity.get('vol_oi')
+        self.__values['price_init'] = option_activity.get('ref_price')
+        self.__values['value_init'] = option_activity.get('option_price')
+        self.__values['oi_inject'] = False
 
     def get_remaining_days(self):
         return get_time_diff(get_date_str(), self.get('exp_date'))
@@ -56,6 +60,12 @@ class OptionEffect:
                             oi, oi_diff,
                             price,
                             ('+' if price_diff >= 0 else ''), price_diff))
+                if len(v) > 3:
+                    value = v[3]
+                    value_diff = 100 * (value / self.get('value_init') - 1)
+                    display_str += (' value=%d (%s%.1f%%)'
+                            % (value*100,
+                                ('+' if value_diff >= 0 else ''), value_diff))
         return display_str
 
     def get(self, key):
@@ -84,7 +94,7 @@ class OptionEffect:
         # handle the case we already called track today
         self.__values['effect'].pop(get_date_str(), None)
         # 1. lookup oi change
-        (found1, oi) = lookup_option_chain_info(
+        (found1, oi, value) = lookup_option_chain_info(
                 symbol, get_date(exp_date),
                 self.get('option_type'), self.get('strike_price'),
                 save_file=False, folder=folder)
@@ -100,7 +110,7 @@ class OptionEffect:
                 # compare w/ last record
                 if len(self.__values['effect']) > 0:
                     last_key = list(self.__values['effect'].keys())[-1]
-                    (l_oi, l_price, l_show) = self.__values['effect'][last_key]
+                    (l_oi, l_price, l_show) = self.__values['effect'][last_key][0:3]
                     if l_oi < 1 or oi/l_oi > 1.2 or oi/l_oi < 0.8:
                         is_show = True
                     if price/l_price > 1.04 or price/l_price < 0.96:
@@ -118,7 +128,7 @@ class OptionEffect:
                     oi_change = True
                 if (not l_show) and (price_change or oi_change):
                     is_show = True
-                self.__values['effect'][get_date_str()] = (oi, price, is_show)
+                self.__values['effect'][get_date_str()] = (oi, price, is_show, value)
             else:
                 logger.error('%s error quote for %s not found'
                         % (get_time_log(), symbol))

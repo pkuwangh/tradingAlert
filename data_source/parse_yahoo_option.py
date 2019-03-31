@@ -21,10 +21,12 @@ def get_date_in_url(exp_date):
 def extract_contract_info(contract):
     option_items = contract.split()
     option_interest = (int)(option_items[-2].replace(',', ''))
-    return (option_interest)
+    option_price = (float)(option_items[-8].replace(',', ''))
+    return (option_interest, option_price)
 
 def scan_option_chain(symbol, exp_date, option_type, strike, option_chain):
     open_interest = -1
+    option_price = 0
     exp_date_str = get_date_str(exp_date)
     strike_str = '%08d' % (strike * 1000)
     contract_name = symbol + exp_date_str + option_type + strike_str
@@ -32,11 +34,12 @@ def scan_option_chain(symbol, exp_date, option_type, strike, option_chain):
             % (get_time_log(), symbol, exp_date_str, option_type, strike))
     for contract in option_chain:
         if contract.startswith(contract_name):
-            open_interest = extract_contract_info(contract)
-            logger.info('%s got OI=%d for %s exp=%s from {%s}'
-                    % (get_time_log(), open_interest, symbol, exp_date_str, contract.rstrip()))
+            (open_interest, option_price) = extract_contract_info(contract)
+            logger.info('%s got OI=%d value=%.2f for %s exp=%s from {%s}'
+                    % (get_time_log(), open_interest, option_price,
+                        symbol, exp_date_str, contract.rstrip()))
             break
-    return (contract_name, open_interest >= 0, open_interest)
+    return (contract_name, open_interest >= 0, open_interest, option_price)
 
 def lookup_option_chain_info(symbol, exp_date, option_type, strike, save_file=False, folder='logs'):
     # read web data
@@ -56,7 +59,7 @@ def lookup_option_chain_info(symbol, exp_date, option_type, strike, save_file=Fa
     if web_data is None:
         return (False, 0)
     # lookup
-    (contract_name, found, open_interest) = \
+    (contract_name, found, open_interest, option_price) = \
             scan_option_chain(symbol, exp_date, option_type, strike, web_data.splitlines())
     # save a copy
     if save_file:
@@ -70,7 +73,7 @@ def lookup_option_chain_info(symbol, exp_date, option_type, strike, save_file=Fa
         with openw(filename, 'wt') as fout:
             fout.write(web_data)
         logger.debug('%s save %s option chain to %s' % (get_time_log(), symbol, filename))
-    return (found, open_interest)
+    return (found, open_interest, option_price)
 
 if __name__ == '__main__':
     meta_data_dir = os.path.join(root_dir, 'logs')
@@ -81,6 +84,6 @@ if __name__ == '__main__':
     logging.getLogger().addHandler(logging.StreamHandler())
 
     exp_date = datetime.datetime(2020,1,17)
-    (found, open_interest) = lookup_option_chain_info('MSFT', exp_date, 'P', 100, True)
-    print ('open interest is %d' % (open_interest))
+    (found, open_interest, option_price) = lookup_option_chain_info('MSFT', exp_date, 'P', 100, True)
+    print ('open interest is %d; value is %.2f' % (open_interest, option_price))
 
