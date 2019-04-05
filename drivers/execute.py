@@ -27,7 +27,7 @@ def run_hunt():
     return hunted_list
 
 
-def execute(send_out=False):
+def execute(send_regular=False, send_prime=False):
     work_pool = Pool(processes = 2)
     res1 = work_pool.apply_async(run_track, ())
     res2 = work_pool.apply_async(run_hunt, ())
@@ -51,16 +51,17 @@ def execute(send_out=False):
     text += "\n"
     print (text)
     # send email to my beloved followers
-    send_now = send_out
-    if not send_now:
-        user_input = input('send above results to subscribers? (yes/no): ')
+    if not (send_regular or send_prime):
+        user_input = input('send above results to subscribers? (yes/no/prime): ')
         if 'yes' in user_input:
-            send_now = True
-    if send_now:
+            send_regular = True
+        if 'prime' in user_input:
+            send_prime = True
+    if send_regular or send_prime:
         from utils.send_email import MailMan
         mail_man = MailMan()
         subject = 'Option activity on %s' % (get_datetime_str())
-        mail_man.send(subject=subject, content=text)
+        mail_man.send(subject=subject, content=text, prime=send_prime)
 
 
 if __name__ == '__main__':
@@ -75,10 +76,12 @@ if __name__ == '__main__':
 
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('--send-out', '-s', action='store_true',
-            help='send out result')
+    parser.add_argument('--send-regular', '-r', action='store_true',
+            help='send out result to regular users')
+    parser.add_argument('--send-prime', '-p', action='store_true',
+            help='send out result to prime users')
 
     args = parser.parse_args()
     # execute all
-    execute(args.send_out)
+    execute(args.send_regular, args.send_prime)
 

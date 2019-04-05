@@ -29,18 +29,28 @@ class MailMan:
             self.__password = sender_dict[self.__sender]
             self.msg['From'] = self.__sender
             # receivers
+            # regular users
             receiver_json = os.path.join(root_dir, 'email', 'receiver.json')
             with openw(receiver_json, 'rt') as fp:
                 receiver_dict = json.load(fp)
-            receivers = [v for v in receiver_dict.values()]
-            self.msg['To'] = ','.join(receivers)
+            self.receivers = [v for v in receiver_dict.values()]
+            # prime users
+            prime_json = os.path.join(root_dir, 'email', 'prime.json')
+            with openw(prime_json, 'rt') as fp:
+                prime_dict = json.load(fp)
+            self.prime_users = [v for v in prime_dict.values()]
         except Exception as e:
             logger.error('error when initing MailMan: %s' % (e))
             self.__status_good = False
 
-    def send(self, subject, content):
+    def send(self, subject, content, prime=False):
         if self.__status_good:
-            self.msg['Subject'] = subject
+            if prime:
+                self.msg['To'] = ','.join(self.prime_users)
+                self.msg['Subject'] = 'Prime: ' + subject
+            else:
+                self.msg['To'] = ','.join(self.receivers)
+                self.msg['Subject'] = subject
             main_text = MIMEText(content, 'plain')
             self.msg.attach(main_text)
             # send
