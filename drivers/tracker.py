@@ -27,11 +27,11 @@ def track_group(activity_dir, force_notify=False):
                 logger.warning('%s ignore activity of today: %s'
                         % (get_time_log(), option_activity.get_basic_display_str()))
                 continue
-            (found, price_change, oi_change) = option_effect.track_change()
+            (found, price_change, oi_change, is_show) = option_effect.track_change()
             if found:
                 option_effect.serialize(OptionEffectFactory.folder)
                 num_days = option_effect.get_remaining_days()
-                if price_change or oi_change or num_days%7 == 0 or num_days < 4 or force_notify:
+                if price_change or oi_change or is_show or num_days%7 == 0 or num_days < 4 or force_notify:
                     notify_list.append(option_effect)
     notify_list.sort()
     return notify_list

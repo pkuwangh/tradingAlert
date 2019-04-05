@@ -91,6 +91,7 @@ class OptionEffect:
         from data_source.parse_yahoo_quote  import lookup_quote_summary
         price_change = False
         oi_change = False
+        is_show = False
         # handle the case we already called track today
         self.__values['effect'].pop(get_date_str(), None)
         # 1. lookup oi change
@@ -110,24 +111,26 @@ class OptionEffect:
                 # compare w/ last record
                 if len(self.__values['effect']) > 0:
                     last_key = list(self.__values['effect'].keys())[-1]
+                    # find out last record
+                    for k in self.__values['effect'].keys():
+                        if self.__values['effect'][k][2]:
+                            last_key = k
                     (l_oi, l_price, l_show) = self.__values['effect'][last_key][0:3]
-                    if l_oi < 1 or oi/l_oi > 1.2 or oi/l_oi < 0.8:
+                    if l_oi < 1 or oi/l_oi > 1.15 or oi/l_oi < 0.85:
                         is_show = True
-                    if price/l_price > 1.04 or price/l_price < 0.96:
+                    if price/l_price > 1.03 or price/l_price < 0.97:
                         is_show = True
                 else:
                     is_show = True
                 # compare w/ init record
-                if price/self.get('price_init') > 1.08 or \
-                        price/self.get('price_init') < 0.92:
+                if price/self.get('price_init') > 1.06 or \
+                        price/self.get('price_init') < 0.94:
                     price_change = True
                 if (not self.get('oi_inject') and \
                         oi > self.get('oi_init')) and \
                         (oi - self.get('oi_init')) / self.get('volume') > 0.5:
                     self.__values['oi_inject'] = True
                     oi_change = True
-                if (not l_show) and (price_change or oi_change):
-                    is_show = True
                 self.__values['effect'][get_date_str()] = (oi, price, is_show, value)
             else:
                 logger.error('%s error quote for %s not found'
@@ -135,7 +138,7 @@ class OptionEffect:
         else:
             logger.error('%s error OI for %s exp=%s not found'
                     % (get_time_log(), symbol, exp_date))
-        return (found1 and found2, price_change, oi_change)
+        return (found1 and found2, price_change, oi_change, is_show)
 
     def unserialize(self, filename):
         import json
@@ -209,12 +212,12 @@ if __name__ == '__main__':
         option_activity = OptionActivity()
         option_activity.unserialize(item)
         option_effect = OptionEffectFactory.create(option_activity)
-        (found, price_change, oi_change) = option_effect.track_change()
+        (found, price_change, oi_change, is_show) = option_effect.track_change()
         option_effect.serialize(OptionEffectFactory.folder)
         if found and price_change:
-            print ('Price change over 10%%: %s' \
+            print ('Price change over threshold: %s' \
                     % (option_effect.get('symbol')))
         if found and oi_change:
-            print ('OI change over 50%% volume : %s' \
+            print ('OI change over threshold: %s' \
                     % (option_effect.get('symbol')))
 
