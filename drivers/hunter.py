@@ -17,9 +17,9 @@ def filter_base(new_option_activity, option_volume_cache):
     thd_tot_cost = 200
     thd_ext_value = 100
     thd_d2e_min = 2
-    thd_d2e_max = 60
+    thd_d2e_max = 61
     thd_vol_spike = 2
-    thd_vol_dist = 0.6
+    thd_vol_dist = 0.45
     # stage 1: simple filtering
     # ----------------------------------------------------------------
     # volume/open interest: first blood ?
@@ -65,10 +65,10 @@ def filter_detail(new_option_activity, option_volume_cache):
     # it should be extreme in some aspect(s)
     mid_vol_oi  = (new_option_activity.get('vol_oi') > 5)
     high_vol_oi = (new_option_activity.get('vol_oi') > 20)
-    high_cost = (new_option_activity.get('total_cost') > 1000)
-    high_ext_value = (new_option_activity.get('ext_value') > 500)
+    high_cost = (new_option_activity.get('total_cost') > 800)
+    high_ext_value = (new_option_activity.get('ext_value') > 400)
     mid_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 3)
-    high_volume_spike = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 6)
+    high_volume_spike = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 5)
     mid_volume_domin  = (new_option_activity.get('volume') > new_option_activity.get('option_volume') * 0.75)
     high_volume_domin = (new_option_activity.get('volume') > new_option_activity.get('option_volume') * 0.9)
     # types of unusual activity
@@ -98,7 +98,7 @@ def hunt():
     from data_source.parse_barchart_activity import get_option_activity
     from analysis.option_activity import OptionActivity
     option_activity_list = get_option_activity(save_file=True, folder='records/raw_option_activity')
-#    infile = os.path.join(root_dir, 'records', 'raw_option_activity', 'OA_190326_225012.txt.gz')
+#    infile = os.path.join(root_dir, 'records', 'raw_option_activity', 'OA_190404_220802.txt.gz')
 #    fin = openw(infile, 'rt')
 #    option_activity_list = fin.readlines()
     # look into each one

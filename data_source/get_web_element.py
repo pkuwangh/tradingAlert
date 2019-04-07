@@ -26,6 +26,9 @@ class ChromeDriver:
         self.chrome_options = Options()
         self.chrome_options.add_argument('--headless')
         self.chrome_options.add_argument('--window-size=1920,3240')
+        self.chrome_options.add_argument('--no-proxy-server')
+        self.chrome_options.add_argument("--proxy-server='direct://'")
+        self.chrome_options.add_argument("--proxy-bypass-list=*")
         self.chrome_options.binary_location = ChromeDriver.binary_path
         num_retry = 0
         retry_timeout = 4

@@ -18,6 +18,7 @@ class OptionEffect:
         self.__values['effect'] = {}
         if option_activity:
             self.initialize(option_activity)
+        self.trade_note_json = os.path.join(root_dir, 'records', 'manual_track', 'trade_note.json')
 
     def __lt__(self, other):
         if self.get('option_type') == other.get('option_type'):
@@ -46,7 +47,19 @@ class OptionEffect:
         return get_time_diff(self.get('deal_time'), get_date_str())
 
     def get_display_str(self):
+        # option activity string
         display_str = self.get('display_str')
+        # read note
+        import json
+        try:
+            with openw(self.trade_note_json, 'rt') as fp:
+                json_dict = json.load(fp)
+            if self.get('signature') in json_dict:
+                trade_note = json_dict[self.get('signature')]
+                display_str += ('\n  ++ %s' % (trade_note))
+        except:
+            pass
+        # auto-track info
         for date_str in self.__values['effect'].keys():
             v = self.__values['effect'][date_str]
             oi = v[0]
@@ -54,7 +67,7 @@ class OptionEffect:
             oi_diff = oi / self.get('oi_init')
             price_diff = 100 * (price / self.get('price_init') - 1)
             if v[2] or date_str == list(self.__values['effect'].keys())[-1]:
-                display_str += ('\n\t%s/%s: days=%2d oi=%d (%.1fX) price=%.1f (%s%.1f%%)'
+                display_str += ('\n     >> %s/%s: days=%2d oi=%d (%.1fX) price=%.1f (%s%.1f%%)'
                         % (date_str[2:4], date_str[4:6],
                             get_time_diff(date_str, self.get('exp_date')),
                             oi, oi_diff,
