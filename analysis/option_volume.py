@@ -15,7 +15,7 @@ class OptionVolumeCache:
     expire_threshold = 15   # in days
     def __init__(self, filename=None, init_dump=False):
         if filename is None:
-            filename = os.path.join(root_dir, 'records', 'cache', 'avg_option_volume.db')
+            filename = os.path.join(root_dir, 'records', 'cache', 'option_volume.db')
         self.__cache = pickledb.load(filename, auto_dump=init_dump)
 
     def lookup(self, symbol, avg_only, folder='records'):
@@ -58,8 +58,8 @@ if __name__ == '__main__':
     logging.basicConfig(filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
     option_volume_cache = OptionVolumeCache()
-    (found, option_volume_info) = option_volume_cache.lookup('BABA', avg_only=False)
+    (found, option_volume_info) = option_volume_cache.lookup('ECA', avg_only=False)
     print ('%s found=%d vol_today=%d vol_3mon=%d' %
-            ('BABA', found, option_volume_info['vol_today'], option_volume_info['vol_3mon']))
+            ('ECA', found, option_volume_info['vol_today'], option_volume_info['vol_3mon']))
     option_volume_cache.close()
 

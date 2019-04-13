@@ -19,6 +19,7 @@ class OptionEffect:
         if option_activity:
             self.initialize(option_activity)
         self.trade_note_json = os.path.join(root_dir, 'records', 'manual_track', 'trade_note.json')
+        self.transaction_json = os.path.join(root_dir, 'records', 'manual_track', 'transaction.json')
 
     def __lt__(self, other):
         if self.get('option_type') == other.get('option_type'):
@@ -56,7 +57,7 @@ class OptionEffect:
                 json_dict = json.load(fp)
             if self.get('signature') in json_dict:
                 trade_note = json_dict[self.get('signature')]
-                display_str += ('\n  ++ %s' % (trade_note))
+                display_str += ('\n    ++ %s' % (trade_note))
         except:
             pass
         # auto-track info
@@ -67,7 +68,7 @@ class OptionEffect:
             oi_diff = oi / self.get('oi_init')
             price_diff = 100 * (price / self.get('price_init') - 1)
             if v[2] or date_str == list(self.__values['effect'].keys())[-1]:
-                display_str += ('\n     >> %s/%s: days=%2d oi=%d (%.1fX) price=%.1f (%s%.1f%%)'
+                display_str += ('\n       >> %s/%s: days=%2d oi=%d (%.1fX) price=%.1f (%s%.1f%%)'
                         % (date_str[2:4], date_str[4:6],
                             get_time_diff(date_str, self.get('exp_date')),
                             oi, oi_diff,
@@ -79,6 +80,16 @@ class OptionEffect:
                     display_str += (' value=%d (%s%.1f%%)'
                             % (value*100,
                                 ('+' if value_diff >= 0 else ''), value_diff))
+        try:
+            with openw(self.transaction_json, 'rt') as fp:
+                json_dict = json.load(fp)
+                if self.get('signature') in json_dict:
+                    (sell_date, profit, sell_note) = json_dict[self.get('signature')]
+                    display_str += ('\n    ## %s%d, %s on %s'
+                            % (('+' if profit >= 0 else ''),
+                                profit, sell_note, sell_date))
+        except:
+            pass
         return display_str
 
     def get(self, key):

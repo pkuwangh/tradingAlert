@@ -83,7 +83,7 @@ if __name__ == '__main__':
     logging.basicConfig(filename=log_file, filemode='a')
     logging.getLogger().addHandler(logging.StreamHandler())
 
-    exp_date = datetime.datetime(2020,1,17)
-    (found, open_interest, option_price) = lookup_option_chain_info('MSFT', exp_date, 'P', 100, True)
+    exp_date = datetime.datetime(2019,5,17)
+    (found, open_interest, option_price) = lookup_option_chain_info('WBT', exp_date, 'P', 15, True)
     print ('open interest is %d; value is %.2f' % (open_interest, option_price))
 

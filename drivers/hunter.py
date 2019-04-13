@@ -98,7 +98,7 @@ def hunt():
     from data_source.parse_barchart_activity import get_option_activity
     from analysis.option_activity import OptionActivity
     option_activity_list = get_option_activity(save_file=True, folder='records/raw_option_activity')
-#    infile = os.path.join(root_dir, 'records', 'raw_option_activity', 'OA_190404_220802.txt.gz')
+#    infile = os.path.join(root_dir, 'records', 'raw_option_activity', 'OA_190412_110621.txt.gz')
 #    fin = openw(infile, 'rt')
 #    option_activity_list = fin.readlines()
     # look into each one
