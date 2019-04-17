@@ -11,28 +11,36 @@ sys.path.append(root_dir)
 from utils.datetime_string import *
 from utils.file_rdwr import *
 
-def track_group(activity_dir, force_notify=False):
-    # find live-tracked activity
+def track_from_act(activity_file, notify_list):
     from analysis.option_activity import OptionActivity
     from analysis.option_effect   import OptionEffectFactory
     from analysis.option_effect   import OptionEffect
-    notify_list = []
-    for item in os.listdir(activity_dir):
-        if item.startswith('Act'):
-            src_file = os.path.join(activity_dir, item)
-            option_activity = OptionActivity()
-            option_activity.unserialize(src_file)
-            option_effect = OptionEffectFactory.create(option_activity)
-            if option_effect.get_elapsed_days() < 1:
-                logger.warning('%s ignore activity of today: %s'
-                        % (get_time_log(), option_activity.get_basic_display_str()))
-                continue
-            (found, price_change, oi_change, is_show) = option_effect.track_change()
-            if found:
-                option_effect.serialize(OptionEffectFactory.folder)
-                num_days = option_effect.get_remaining_days()
-                if price_change or oi_change or is_show or num_days%7 == 0 or num_days < 4 or force_notify:
-                    notify_list.append(option_effect)
+    option_activity = OptionActivity()
+    option_activity.unserialize(activity_file)
+    option_effect = OptionEffectFactory.create(option_activity)
+    if option_effect.get_elapsed_days() < 1:
+        logger.warning('%s ignore activity of today: %s'
+                % (get_time_log(), option_activity.get_basic_display_str()))
+        return
+    (found, price_change, oi_change, is_show) = option_effect.track_change()
+    if found:
+        option_effect.serialize(OptionEffectFactory.folder)
+        num_days = option_effect.get_remaining_days()
+        if price_change or oi_change or is_show or num_days%7 == 0 or num_days < 4 or force_notify:
+            # append is thread safe
+            notify_list.append(option_effect)
+
+def track_group(activity_dir, force_notify=False):
+    if not force_notify:
+        return []
+    # find live-tracked activity
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        notify_list = []
+        for item in os.listdir(activity_dir):
+            if item.startswith('Act'):
+                src_file = os.path.join(activity_dir, item)
+                executor.submit(track_from_act, src_file, notify_list)
     notify_list.sort()
     return notify_list
 

@@ -35,28 +35,30 @@ def execute(send_regular=False, send_prime=False):
     work_pool.join()
     (hold_list, live_list) = res1.get()
     hunted_list = res2.get()
-    # prepare output
-    text = ""
-    text += "======== Today's Unusual Option Activity (UOA) ========\n"
-    for item in hunted_list:
-        text += (item.get_ext_display_str() + "\n")
-    text += "\n"
-    text += "======== Current Holdings ========\n"
-    for item in hold_list:
-        text += (item.get_display_str() + "\n")
-    text += "\n"
-    text += "======== Live-Tracked UOA Effect ========\n"
-    for item in live_list:
-        text += (item.get_display_str() + "\n")
-    text += "\n"
-    print (text)
-    # send email to my beloved followers
+    # send email or print to terminal ?
     if not (send_regular or send_prime):
         user_input = input('send above results to subscribers? (yes/no/prime): ')
         if 'yes' in user_input:
             send_regular = True
         if 'prime' in user_input:
             send_prime = True
+    term_print = (not (send_regular or send_prime))
+    # prepare output
+    text = ""
+    text += "======== Today's Unusual Option Activity (UOA) ========\n"
+    for item in hunted_list:
+        text += (item.get_ext_display_str(color=term_print) + "\n")
+    text += "\n"
+    text += "======== Current Holdings ========\n"
+    for item in hold_list:
+        text += (item.get_display_str(color=term_print) + "\n")
+    text += "\n"
+    text += "======== Live-Tracked UOA Effect ========\n"
+    for item in live_list:
+        text += (item.get_display_str(color=term_print) + "\n")
+    text += "\n"
+    print (text)
+    # send email to my beloved followers
     if send_regular or send_prime:
         from utils.send_email import MailMan
         mail_man = MailMan()

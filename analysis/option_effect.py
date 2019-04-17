@@ -18,7 +18,7 @@ class OptionEffect:
         self.__values['effect'] = {}
         if option_activity:
             self.initialize(option_activity)
-        self.trade_note_json = os.path.join(root_dir, 'records', 'manual_track', 'trade_note.json')
+        self.trade_note_json = os.path.join(root_dir, 'records', 'manual_track', 'note.json')
         self.transaction_json = os.path.join(root_dir, 'records', 'manual_track', 'transaction.json')
 
     def __lt__(self, other):
@@ -47,9 +47,12 @@ class OptionEffect:
     def get_elapsed_days(self):
         return get_time_diff(self.get('deal_time'), get_date_str())
 
-    def get_display_str(self):
+    def get_display_str(self, color=True):
         # option activity string
-        display_str = self.get('display_str')
+        display_str = '%s%s%s' % \
+                (('\033[33;5m' if color else ''),
+                        self.get('display_str'),
+                        ('\033[0m' if color else ''))
         # read note
         import json
         try:
@@ -66,7 +69,7 @@ class OptionEffect:
             oi = v[0]
             price = v[1]
             oi_diff = oi / self.get('oi_init')
-            price_diff = 100 * (price / self.get('price_init') - 1)
+            price_diff = 100 * (price / (self.get('price_init') + 0.001) - 1)
             if v[2] or date_str == list(self.__values['effect'].keys())[-1]:
                 display_str += ('\n       >> %s/%s: days=%2d oi=%d (%.1fX) price=%.1f (%s%.1f%%)'
                         % (date_str[2:4], date_str[4:6],
@@ -75,19 +78,28 @@ class OptionEffect:
                             price,
                             ('+' if price_diff >= 0 else ''), price_diff))
                 if len(v) > 3:
+                    # option value
                     value = v[3]
-                    value_diff = 100 * (value / self.get('value_init') - 1)
+                    value_diff = 100 * (value / (self.get('value_init') + 0.001) - 1)
                     display_str += (' value=%d (%s%.1f%%)'
                             % (value*100,
                                 ('+' if value_diff >= 0 else ''), value_diff))
+                if len(v) > 4:
+                    # option volume
+                    volume = v[4]
+                    vol_oi = 100 * volume / (oi + 0.001)
+                    display_str += (' vol=%d (%.1f%%)'
+                            % (volume, vol_oi))
         try:
             with openw(self.transaction_json, 'rt') as fp:
                 json_dict = json.load(fp)
                 if self.get('signature') in json_dict:
                     (sell_date, profit, sell_note) = json_dict[self.get('signature')]
-                    display_str += ('\n    ## %s%d, %s on %s'
-                            % (('+' if profit >= 0 else ''),
-                                profit, sell_note, sell_date))
+                    display_str += ('\n%s    ## %s%d, %s on %s%s'
+                            % (('\033[32;5m' if color else ''),
+                                ('+' if profit >= 0 else ''),
+                                profit, sell_note, sell_date,
+                                ('\033[0m' if color else '')))
         except:
             pass
         return display_str
@@ -119,7 +131,7 @@ class OptionEffect:
         # handle the case we already called track today
         self.__values['effect'].pop(get_date_str(), None)
         # 1. lookup oi change
-        (found1, oi, value) = lookup_option_chain_info(
+        (found1, oi, value, volume) = lookup_option_chain_info(
                 symbol, get_date(exp_date),
                 self.get('option_type'), self.get('strike_price'),
                 save_file=False, folder=folder)
@@ -155,7 +167,7 @@ class OptionEffect:
                         (oi - self.get('oi_init')) / self.get('volume') > 0.5:
                     self.__values['oi_inject'] = True
                     oi_change = True
-                self.__values['effect'][get_date_str()] = (oi, price, is_show, value)
+                self.__values['effect'][get_date_str()] = (oi, price, is_show, value, volume)
             else:
                 logger.error('%s error quote for %s not found'
                         % (get_time_log(), symbol))

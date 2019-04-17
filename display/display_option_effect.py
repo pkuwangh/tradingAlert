@@ -40,7 +40,7 @@ def print_option_effect(fileset):
                 logger.error('error unserializing %s: %s' % (oe_filename, e))
     oe_list.sort()
     for item in oe_list:
-        print (item.get_display_str())
+        print (item.get_display_str(color=True))
 
 
 if __name__ == '__main__':

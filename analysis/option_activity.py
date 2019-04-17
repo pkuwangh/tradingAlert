@@ -50,17 +50,21 @@ class OptionActivity:
                         self.__peek('ref_price'), self.__peek('strike_price'))
 
     def get_display_str(self):
-        return self.get_basic_display_str() + ' vol/oi=%-2.0f cost=%.1fM ext=%.1fM days=%-2d vol(k)=%-4.1f' % \
-                (self.__peek('vol_oi'),
+        return '%s vol/oi=%-2.0f cost=%.1fM ext=%.1fM days=%-2d vol(k)=%-4.1f' % \
+                (self.get_basic_display_str(),
+                        self.__peek('vol_oi'),
                         self.__peek('total_cost')/1e3,
                         self.__peek('ext_value')/1e3,
                         self.__peek('day_to_exp'),
                         self.__peek('volume')/1000)
 
-    def get_ext_display_str(self):
-        return self.get_display_str() + ' tot_vol=%-4.1f avg_vol=%-4.1f vol/avg=%-4.1f' % \
-                (self.__peek('option_volume')/1000, self.__peek('avg_option_volume')/1000,
-                        self.__peek('volume')/(self.__peek('avg_option_volume')+0.1))
+    def get_ext_display_str(self, color=False):
+        return '%s%s tot_vol=%-4.1f avg_vol=%-4.1f vol/avg=%-4.1f%s' % \
+                (('\033[33;5m' if color else ''),
+                        self.get_display_str(),
+                        self.__peek('option_volume')/1000, self.__peek('avg_option_volume')/1000,
+                        self.__peek('volume')/(self.__peek('avg_option_volume')+0.1),
+                        ('\033[0m' if color else ''))
 
     def get_signature(self):
         if not self.__inited:

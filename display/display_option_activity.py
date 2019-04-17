@@ -25,7 +25,7 @@ def print_option_activity(fileset):
                 logger.error('error displaying %s: %s' % (filename, e))
     oa_list.sort()
     for item in oa_list:
-        print (item.get_ext_display_str())
+        print (item.get_ext_display_str(color=True))
 
 if __name__ == '__main__':
     import argparse
