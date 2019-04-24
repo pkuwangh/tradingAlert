@@ -22,10 +22,9 @@ class ChromeDriver:
     binary_path = '/usr/bin/google-chrome'
     driver_path = '/usr/local/bin/chromedriver'
 
-    def __init__(self, width=1920, height=1080):
+    def __init__(self):
         self.chrome_options = Options()
         self.chrome_options.add_argument('--headless')
-        self.chrome_options.add_argument('--window-size=1920,3240')
         self.chrome_options.add_argument('--no-proxy-server')
         self.chrome_options.add_argument("--proxy-server='direct://'")
         self.chrome_options.add_argument("--proxy-bypass-list=*")
@@ -128,7 +127,7 @@ if __name__ == '__main__':
     logging.basicConfig(filename=log_file, filemode='w')
     logging.getLogger().addHandler(logging.StreamHandler())
     # create chrome driver
-    chrome_driver = ChromeDriver(height=3240)
+    chrome_driver = ChromeDriver()
     # option chain
     url = 'https://finance.yahoo.com/quote/MSFT/options?date=1542326400'
     eid = 'Col1-1-OptionContracts-Proxy'

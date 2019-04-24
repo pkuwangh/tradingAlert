@@ -122,6 +122,7 @@ class OptionEffect:
         num_remaining_days = self.get_remaining_days()
         if num_remaining_days < 0:
             logger.info('%s expired!' % (self.get('signature')))
+            print ('\033[31;1m%s expired!\033[0m' % (self.get('signature')))
             return (False, False, False)
         from data_source.parse_yahoo_option import lookup_option_chain_info
         from data_source.parse_yahoo_quote  import lookup_quote_summary

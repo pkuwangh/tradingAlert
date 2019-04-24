@@ -49,7 +49,7 @@ def lookup_option_chain_info(symbol, exp_date, option_type, strike, save_file=Fa
             % (symbol, get_date_in_url(exp_date))
     eid = 'Col1-1-OptionContracts-Proxy'
     try:
-        chrome_driver = ChromeDriver(height=1080)
+        chrome_driver = ChromeDriver()
         web_data = chrome_driver.download_data(url=url, element_id=eid)
     except:
         web_data = None

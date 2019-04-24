@@ -11,7 +11,7 @@ sys.path.append(root_dir)
 from utils.datetime_string import *
 from utils.file_rdwr import *
 
-def track_from_act(activity_file, notify_list):
+def track_from_act(activity_file, notify_list, force_notify):
     from analysis.option_activity import OptionActivity
     from analysis.option_effect   import OptionEffectFactory
     from analysis.option_effect   import OptionEffect
@@ -31,16 +31,14 @@ def track_from_act(activity_file, notify_list):
             notify_list.append(option_effect)
 
 def track_group(activity_dir, force_notify=False):
-    if not force_notify:
-        return []
     # find live-tracked activity
     from concurrent.futures import ThreadPoolExecutor
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         notify_list = []
         for item in os.listdir(activity_dir):
             if item.startswith('Act'):
                 src_file = os.path.join(activity_dir, item)
-                executor.submit(track_from_act, src_file, notify_list)
+                executor.submit(track_from_act, src_file, notify_list, force_notify)
     notify_list.sort()
     return notify_list
 

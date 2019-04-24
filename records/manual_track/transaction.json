@@ -4,5 +4,6 @@
     "Act190401ZION190418Call4800" : ["190412", 4, "+4%, buy 51x2 sell 53x2"],
     "Act190307LPSN190418Call3000" : ["190416", -90, "-86%, buy 105x1 sell 15x1"],
     "Act190402SC190418Call2300"   : ["190416", -25, "-86%, buy 20x1+15x1 sell 5x2"],
+    "Act190329FLEX190517Call1000" : ["190417", 207, "+171%, buy 60x1+61x1 sell 164x2"],
     "TheEnd" : "dummy note"
 }

@@ -8,6 +8,11 @@
     "Act190410QRTEA190517Call1750": "10K put on bid side & 10K call on ask side",
     "Act190412CDNA190517Call3500" : "1.6K call at Mid, -8% on the day",
     "Act190412CFG190517Call3500"  : "4.5K straddle; related to JPM earning?",
-    "Act190416CARG190517Put4000"  : "multiple trades in 100s Mid/Ask/Above; 5/2 earning",
+    "Act190416CARG190517Put4000"  : "multiple trades in 100s Mid/Ask/Above",
+    "Act190416AMN190517Put4500"   : "2.5K put spread; earning 5/2",
+    "Act190417ITCI190517Call1750" : "call rollover from 4/18 to 5/17; earning 5/3-5/8",
+    "Act190418NRG190517Put3900"   : "50K on ask cancelled? 5K on bid; earning 5/2",
+    "Act190418PS190517Put3000"    : "2K on ask; earning 5/1",
+    "Act190418LECO190517Call9500" : "1K above ask; earning 4/22",
     "TheEnd" : "dummy note"
 }

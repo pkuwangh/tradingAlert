@@ -52,7 +52,7 @@ def lookup_option_breakdown(symbol, save_file=False, folder='logs'):
     url = 'https://marketchameleon.com/Overview/%s/OptionSummary/' % (symbol)
     eid = 'symov_main_content'
     try:
-        chrome_driver = ChromeDriver(height=1080)
+        chrome_driver = ChromeDriver()
         web_data = chrome_driver.download_data(url=url, element_id=eid)
     except:
         web_data = None
@@ -91,7 +91,7 @@ def lookup_option_volume(symbol, save_file=False, folder='logs'):
     url = 'https://marketchameleon.com/Overview/%s/' % (symbol)
     eid = 'daily_chart_extended_stats_div'
     try:
-        chrome_driver = ChromeDriver(height=1080)
+        chrome_driver = ChromeDriver()
         web_data = chrome_driver.download_data(url=url, element_id=eid)
     except:
         web_data = None

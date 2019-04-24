@@ -70,7 +70,7 @@ def lookup_quote_summary(symbol, save_file=False, folder='logs'):
     url = 'https://finance.yahoo.com/quote/%s' % (symbol)
     eid = 'quote-summary'
     try:
-        chrome_driver = ChromeDriver(height=1080)
+        chrome_driver = ChromeDriver()
         web_data = chrome_driver.download_data(url=url, element_id=eid)
     except:
         web_data = None
