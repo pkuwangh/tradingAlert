@@ -53,12 +53,13 @@ def lookup_option_activity():
     # read web data
     url = 'https://www.barchart.com/options/unusual-activity/stocks'
     eid = 'main-content-column'
-    show_all = 'a.show-all.ng-scope'
-#    show_all = 'a.show-all'
+#    show_all = 'a.show-all.ng-scope'
+    show_all = 'a.show-all'
+    buttons = [show_all]
     try:
         chrome_driver = ChromeDriver()
         outfile = os.path.join(root_dir, 'logs', 'data_option_activity.txt')
-        web_data = chrome_driver.download_data(url=url, button_css_sel=show_all, element_id=eid, outfile=outfile)
+        web_data = chrome_driver.download_data(url=url, button_css_sel=buttons, element_id=eid, outfile=outfile)
     except:
         web_data = None
     try:

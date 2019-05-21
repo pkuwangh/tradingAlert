@@ -14,5 +14,17 @@
     "Act190418NRG190517Put3900"   : "50K on ask cancelled? 5K on bid; earning 5/2",
     "Act190418PS190517Put3000"    : "2K on ask; earning 5/1",
     "Act190418LECO190517Call9500" : "1K above ask; earning 4/22",
+    "Act190423CVE190621Call1200"  : "37.5Kx2+35Kx2 call; Mid & Above; earning 4/24",
+    "Act190423CERN190517Call6500" : "4.2K 60 put sell & 65 call buy; earning 4/25",
+    "Act190429SABR190517Call2250" : "many small trades, more on ask side; earning next day",
+    "Act190502MSGN190517Call2250" : "down 7% on the day, many small trades",
+    "Act190502CWH190517Put1200"   : "otm put on ask, earning 5/8",
+    "Act190506GIII190517Call4000" : "down 8.7% on the day, 2.7K call close to ask side; more small trades on ask",
+    "Act190506IQV190621Call14500" : "9.4K call close to ask side",
+    "Act190514BVN190621Call1600"  : "many small-size calls; also non-trivial put spread",
+    "Act190515DBX190621Call2300"  : "many small-size calls; more on ask side; some classified as inter-market sweep",
+    "Act190515FLEX190621Call1100" : "bid-ask spread is tight; 2.5K call plus small trades",
+    "Act190516CHS190621Put400"    : "2.5K on ask, 1.7K close to ask",
+    "Act190516RNG190621Call13000" : "2.2K at mid; more small-size calls on ask",
     "TheEnd" : "dummy note"
 }

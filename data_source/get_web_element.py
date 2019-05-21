@@ -25,6 +25,7 @@ class ChromeDriver:
     def __init__(self):
         self.chrome_options = Options()
         self.chrome_options.add_argument('--headless')
+        self.chrome_options.add_argument('--window-size=1920,1080')
         self.chrome_options.add_argument('--no-proxy-server')
         self.chrome_options.add_argument("--proxy-server='direct://'")
         self.chrome_options.add_argument("--proxy-bypass-list=*")
@@ -63,11 +64,17 @@ class ChromeDriver:
             time.sleep(5*random.random())
             # click a button if needed
             if button_css_sel:
-                try:
-                    button = self.driver.find_element_by_css_selector(button_css_sel).click()
-                except Exception as e:
-                    logger.warning('error when getting button=%s: %s (retry=%d)'
-                            % (button_css_sel, e, num_retry))
+                all_seq_good = True
+                for button_to_click in button_css_sel:
+                    try:
+                        button = self.driver.find_element_by_css_selector(button_to_click).click()
+                        time.sleep(5*random.random())
+                    except Exception as e:
+                        logger.warning('error when getting button=%s: %s (retry=%d)'
+                                % (button_to_click, e, num_retry))
+                        all_seq_good = False
+                        break
+                if not all_seq_good:
                     if num_retry < 4:
                         time.sleep(10)
                         continue

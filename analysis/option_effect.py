@@ -91,18 +91,25 @@ class OptionEffect:
                     display_str += (' vol=%d (%.1f%%)'
                             % (volume, vol_oi))
         try:
-            with openw(self.transaction_json, 'rt') as fp:
-                json_dict = json.load(fp)
-                if self.get('signature') in json_dict:
-                    (sell_date, profit, sell_note) = json_dict[self.get('signature')]
-                    display_str += ('\n%s    ## %s%d, %s on %s%s'
-                            % (('\033[32;5m' if color else ''),
-                                ('+' if profit >= 0 else ''),
-                                profit, sell_note, sell_date,
-                                ('\033[0m' if color else '')))
+            (found, sell_date, profit, sell_note) = self.get_transaction_note()
+            if found:
+                display_str += ('\n%s    ## %s%d, %s on %s%s'
+                        % (('\033[32;5m' if color else ''),
+                            ('+' if profit >= 0 else ''),
+                            profit, sell_note, sell_date,
+                            ('\033[0m' if color else '')))
         except:
             pass
         return display_str
+
+    def get_transaction_note(self):
+        import json
+        with openw(self.transaction_json, 'rt') as fp:
+            json_dict = json.load(fp)
+            if self.get('signature') in json_dict:
+                (sell_date, profit, sell_note) = json_dict[self.get('signature')]
+                return (True, sell_date, profit, sell_note)
+        return (False, None, 0, None)
 
     def get(self, key):
         if key not in self.__values: raise

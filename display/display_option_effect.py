@@ -39,9 +39,13 @@ def print_option_effect(fileset):
             except Exception as e:
                 logger.error('error unserializing %s: %s' % (oe_filename, e))
     oe_list.sort()
+    total_profit = 0
     for item in oe_list:
+        (found, sell_date, profit, sell_note) = item.get_transaction_note()
+        if found:
+            total_profit += profit
         print (item.get_display_str(color=True))
-
+    print ('total profit: %d\n' % (total_profit))
 
 if __name__ == '__main__':
     import argparse
