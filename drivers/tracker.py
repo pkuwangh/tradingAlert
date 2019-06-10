@@ -46,10 +46,12 @@ def track():
     logger.info('================================================================')
     logger.info('%s the tracker started! 24/7 continuous tracking!' % (get_time_log()))
     hold_activity_dir = os.path.join(root_dir, 'records', 'option_activity_hold')
+    watch_activity_dir = os.path.join(root_dir, 'records', 'option_activity_watch')
     live_activity_dir = os.path.join(root_dir, 'records', 'option_activity_live')
     hold_list = track_group(hold_activity_dir, force_notify=True)
+    watch_list = track_group(watch_activity_dir, force_notify=True)
     live_list = track_group(live_activity_dir)
-    return (hold_list, live_list)
+    return (hold_list, watch_list, live_list)
 
 if __name__ == '__main__':
     meta_data_dir = os.path.join(root_dir, 'logs')
@@ -60,9 +62,12 @@ if __name__ == '__main__':
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
     logging.getLogger().addHandler(stream_handler)
-    (hold_list, live_list) = track()
+    (hold_list, watch_list, live_list) = track()
     print ('current holdings:')
     for item in hold_list:
+        print (item.get_display_str())
+    print ('candidate watch:')
+    for item in watch_list:
         print (item.get_display_str())
     print ('live-tracked:')
     for item in live_list:

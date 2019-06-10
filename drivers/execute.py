@@ -15,9 +15,9 @@ from utils.file_rdwr import *
 def run_track():
     # track past unusual activity
     from drivers.tracker import track
-    (hold_list, live_list) = track()
+    (hold_list, watch_list, live_list) = track()
     logger.info('%s tracking done!' % (get_time_log()))
-    return (hold_list, live_list)
+    return (hold_list, watch_list, live_list)
 
 def run_hunt():
     # hunt for unusual activity
@@ -33,7 +33,7 @@ def execute(send_regular=False, send_prime=False):
     res2 = work_pool.apply_async(run_hunt, ())
     work_pool.close()
     work_pool.join()
-    (hold_list, live_list) = res1.get()
+    (hold_list, watch_list, live_list) = res1.get()
     hunted_list = res2.get()
     # send email or print to terminal ?
     if not (send_regular or send_prime):
@@ -51,6 +51,10 @@ def execute(send_regular=False, send_prime=False):
     text += "\n"
     text += "======== Current Holdings ========\n"
     for item in hold_list:
+        text += (item.get_display_str(color=term_print) + "\n")
+    text += "\n"
+    text += "======== Candidate Watch ========\n"
+    for item in watch_list:
         text += (item.get_display_str(color=term_print) + "\n")
     text += "\n"
     text += "======== Live-Tracked UOA Effect ========\n"

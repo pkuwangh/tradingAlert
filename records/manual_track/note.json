@@ -26,5 +26,9 @@
     "Act190515FLEX190621Call1100" : "bid-ask spread is tight; 2.5K call plus small trades",
     "Act190516CHS190621Put400"    : "2.5K on ask, 1.7K close to ask",
     "Act190516RNG190621Call13000" : "2.2K at mid; more small-size calls on ask",
+    "Act190521CHRS190621Call2000" : "around same time, 1.95K + 0.95K at Mid, many small trades on ask",
+    "Act190521DECK190621Put14500" : "2 big trades; 1K on ask + 0.6K at Mid; earning 5/23",
+    "Act190521IOVA190621Put1500"  : "many straddles",
+    "Act190521SRE190719Call13000" : "many small trades at Mid",
     "TheEnd" : "dummy note"
 }
