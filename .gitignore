@@ -118,6 +118,8 @@ venv.bak/
 #/records/option_activity_hold/*.txt.gz
 /records/option_activity_dead/*.txt
 /records/option_activity_dead/*.txt.gz
+/records/option_activity_dead/archive/*.txt
+/records/option_activity_dead/archive/*.txt.gz
 /records/option_activity_success/*.txt
 /records/option_activity_success/*.txt.gz
 /records/option_activity_failure/*.txt

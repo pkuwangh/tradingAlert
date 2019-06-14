@@ -1,0 +1,119 @@
+general:
+    positive side:
+        very high volume spike:
+            FIS: vol/avg = 20, vol/oi = 38
+            NRG: vol/avg = 12, 3.2M cost
+        huge money:
+            NRG: vol/avg = 12, 3.2M cost
+            DVA: vol/avg = 2.7, 2.0M cost 
+        continuous option buying: a trend that smart money seeing?
+            FIS: 105/110 call spread after 110 call
+            CFG: 35 call in 3 days
+        near the money:
+            FLEX: 10 -> 10
+        sell put & buy call:
+            CERN: sell otm put buy otm call, ahead of ER
+    negative side:
+        hot topic:
+            TSM: call w/ vol/oi only at 2.8
+            LL: put
+            GOOS: put
+            TECH: call
+            INFN: call, price too low at 5
+        out of money too much: more likely to be a blind bet or certain option strategy
+            LPSN: 27.4 -> 30.0 call, although w/ very high volume spike
+            SC: 21.7 -> 23.0 call
+            CWH: 14.3 -> 12.0 put
+            EAT: 43.9 -> 40 put; direction is correct
+            WWE: 89.2 -> 80 put; direction is correct
+            SWN: 4.2 -> 3.5 put; direction is correct; (maybe this is another type of signal, someone buying put to protect due to likely drop?)
+            AVYA: 17.8 -> 15.0 put; direction is correct -18%
+            LOGM: 79 -> 70 put
+            GOOS: 47 -> 40 put
+            DERM: 7.9 -> 6.0 put; price surges +80%
+            SE: 22.9 -> 20 put
+            PGT: 76.9 -> 80 call
+            EMN: 78.5 -> 82.5 call
+            PFPT: 128 -> 140 call
+            SAIL: 28.3 -> 30 call, 0.3M ext
+            ITCI: 12 -> 17.5 call, call rollover?
+            DISH: 34.6 -> 37.5 call, vol/avg=2.4
+            ECA: 7.2 -> 8.0 call, huge money & volume all Okay; profitable in first few days
+            CVE: 10 -> 11 call, avg_vol too high at 14.6
+            ACIA: 59.8 -> 65 call
+            WH: 52.6 -> 57.5 call; direction is correct
+            PAGP: 24.9 -> 26 call, vol/avg=4.4
+            LXRX: 7.8 -> 9.0 call
+            BBD: 11.9 -> 13 call
+            SE: 23 -> 30 call
+        mixed trade:
+            HST: vol=11, tot=22
+            LSCC: vol=4.8, tot=8.5
+            SNE: vol=10, tot=17; plus vol/avg only at 2.9
+            STM: vol=4.3, tot=6.2
+            ZION: put, itm, ext only 0.2M, vol=4.3, tot=6.2, vol/avg only at 2.1
+            SMG: put, itm, ext only 0.3M, vol=2.4, tot=3.3
+            ESTC: put, vol/avg only at 2
+            FTCH: call, vol/avg only at 2.7
+            MSGN: call, ntm/otm, vol=6.1, tot=9.2
+            CAI: call, vol=3.7, tot=7.7
+            BTU: 29/30 call spread
+            PFPT: 130 call, vol=1.5, tot=2.3, vol/avg only at 3.3
+            PTEN: call, itm, 0.1M ext, direction totally wrong
+            ZEN: ntm/otm, vol/avg only at 2.2; although huge money; direction is correct
+            LIN: ntm, vol=5.8, tot=12.4; direction is correct
+            DVA: atm, vol/avg only 2.7
+            IAC: ntm/otm, vol/avg=3.7, 0.3M ext
+        too short: more likely to be a bet
+            PEGI: 10 days; direction is correct though
+            WU: 10 days
+            JNPR: 11 days
+            WWE: 17 days, not sure
+        earning bet: hard to tell, real knowledge vs. pure bet vs. option strategy
+            PS: 31.8 -> 30 put
+            AMN: 48.2 -> 45 put
+            LECO: 91.5 -> 95 call, right before earning
+        big move on the day: bet on a rebound:
+            GIII: call, down 8.7% on the day
+            CDNA: call, down 8% on the day
+
+call:
+    positive side:
+        straightforward pattern:
+            TKR: atm, volume spike, 21 days, most volume on this contract
+            TWNK: itm, volume spike, 38 days, most volume on this contract; - 0.2M ext
+            FITB: ntm, huge money, volume spike, 45 days; - vol=30, tot=45
+            VMC: ntm/otm, huge money, most volume on this contract; - vol/avg=2.8
+            CP: atm, 3.4 volume spike, 0.7M big money; - 210/220 call spread, 13 days
+            WCG: ntm/otm, 3.4 volume spike, 0.7M huge money, 28 days, most volume on this contract
+            IDTI: atm, volume spike, big money, 30 days; must be informed trade
+            GPC: ntm, 30 days; - 0.2M ext, vol/avg=2.7
+            KAR: ntm/otm, volume spike, somewhat big money, 45 days, most volume on this contract
+        straightforward pattern, somewhat profitable:
+            EYE: volume spike, most volume on this contract; - itm, 0.3M ext, 17 days, direction is correct
+            MX: volume spike; - otm too much, 0.3M ext, 17 days, mixed trades
+            UPWK: atm, 4.4 volume spike,; - 0.3M ext, 18 days; sell on time
+            KL: ntm/itm, huge money (1.3M cost, 0.4M ext); - 18 days, vol/avg only at 2
+            MX: ntm, most volume on this contract; - vol/oi=2, 0.3M ext; direction is correct at a point
+            BOX: volume spike, huge money, most volume on this contract; - ntm/otm; profitable at a point
+            PTCT: ntm, 5.1 volume spike, 0.4M ext, 37 days, most volume on this contract; up 5.6% on the day
+            CFG: atm, 4.9 volume spike, 0.7M ext, 35 days; - 4.5K striddle; profitable at a point
+            CFG: atm, 3.4 volume spike, 0.3M ext, 37 days; continuous money flow
+    negative side:
+
+put:
+    positive side:
+        straightforward pattern:
+            EQM: ntm, volume spike, 20+ days, most volume on this contract
+            NRG: ntm/otm, volume spike, 29 days, huge money, most volume on this contract
+            DVA: atm, huge money, 38 days, most volume on this contract
+            RDFN: atm, huge money, 50 days, most volume on this contract
+            MTSI: atm, volume spike, 50 days, most volume on this contract
+            FTCH: atm, huge money, 45 days
+
+    negative side:
+        many small trades: hard to tell
+            SABR: small put more on ask side, right ahead of ER
+            WBT: small put more on ask side
+            CARG: 37.6 -> 40 put, multiple trades in 100s mid/ask/above
+

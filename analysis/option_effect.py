@@ -94,7 +94,7 @@ class OptionEffect:
             (found, sell_date, profit, sell_note) = self.get_transaction_note()
             if found:
                 display_str += ('\n%s    ## %s%d, %s on %s%s'
-                        % (('\033[32;5m' if color else ''),
+                        % (('' if not color else ('\033[32;5m' if profit > 0 else '\033[31;5m')),
                             ('+' if profit >= 0 else ''),
                             profit, sell_note, sell_date,
                             ('\033[0m' if color else '')))
