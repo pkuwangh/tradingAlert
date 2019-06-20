@@ -13,34 +13,44 @@ from utils.file_rdwr import *
 
 def filter_base(new_option_activity, option_volume_cache):
     # parameters
-    thd_vol_oi = 2
+    thd_vol_oi = 3
     thd_tot_cost = 200
-    thd_ext_value = 100
+    thd_ext_value = 200
     thd_d2e_min = 2
     thd_d2e_max = 61
-    thd_vol_spike = 2
+    thd_otm = 10
+    thd_vol_spike = 3
     thd_vol_dist = 0.45
     # stage 1: simple filtering
     # ----------------------------------------------------------------
     # volume/open interest: first blood ?
     if new_option_activity.get('vol_oi') < thd_vol_oi:
+        #print ('vol_oi=%.1f' % new_option_activity.get('vol_oi'))
         return False
     # total cost: serious money ?
     if new_option_activity.get('total_cost') < thd_tot_cost:
+        #print ('total_cost=%.1f' % new_option_activity.get('total_cost'))
         return False
     # extrinsic value: real money in risk ?
     if new_option_activity.get('ext_value') < thd_ext_value:
+        #print ('ext_value=%.1f' % new_option_activity.get('ext_value'))
         return False
     # day to exp: not too-long term ?
     if new_option_activity.get('day_to_exp') < thd_d2e_min:
+        #print ('day_to_exp=%.1f' % new_option_activity.get('day_to_exp'))
         return False
     if new_option_activity.get('day_to_exp') > thd_d2e_max:
+        #print ('day_to_exp=%.1f' % new_option_activity.get('day_to_exp'))
+        return False
+    # otm check: expect atm/ntm ?
+    if new_option_activity.get_otm() > thd_otm:
         return False
     # volume/average volume: volume spike ?
     volume_folder = 'records/raw_option_volume'
     (found, option_info) = option_volume_cache.lookup(symbol=new_option_activity.get('symbol'), avg_only=True, folder=volume_folder)
     if found:
         if new_option_activity.get('volume') < option_info['vol_3mon'] * thd_vol_spike:
+            #print ('vol=%d vol_3mon=%d' % (new_option_activity.get('volume'), option_info['vol_3mon']))
             return False
     else:
         logger.error('%s cannot find avg. option volume info for %s' % (get_time_log(), new_option_activity.get('symbol')))
@@ -51,6 +61,7 @@ def filter_base(new_option_activity, option_volume_cache):
     (found, option_info) = option_volume_cache.lookup(symbol=new_option_activity.get('symbol'), avg_only=False, folder=volume_folder)
     if found:
         if new_option_activity.get('volume') < option_info['vol_today'] * thd_vol_dist:
+            #print ('vol=%d vol_today=%d' % (new_option_activity.get('volume'), option_info['vol_today']))
             return False
     else:
         logger.error('%s cannot find total option volume info for %s' % (get_time_log(), new_option_activity.get('symbol')))
@@ -63,19 +74,31 @@ def filter_base(new_option_activity, option_volume_cache):
 
 def filter_detail(new_option_activity, option_volume_cache):
     # it should be extreme in some aspect(s)
+    # volume on the contract
     mid_vol_oi  = (new_option_activity.get('vol_oi') > 5)
-    high_vol_oi = (new_option_activity.get('vol_oi') > 20)
-    high_cost = (new_option_activity.get('total_cost') > 800)
+    high_vol_oi = (new_option_activity.get('vol_oi') > 10)
+    # cost
+    high_cost = (new_option_activity.get('total_cost') > 700)
     high_ext_value = (new_option_activity.get('ext_value') > 400)
-    mid_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 3)
-    high_volume_spike = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 5)
+    # volume spike
+    mid_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 4)
+    high_volume_spike = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 8)
+    # volume today
     mid_volume_domin  = (new_option_activity.get('volume') > new_option_activity.get('option_volume') * 0.75)
-    high_volume_domin = (new_option_activity.get('volume') > new_option_activity.get('option_volume') * 0.9)
+    high_volume_domin = (new_option_activity.get('volume') > new_option_activity.get('option_volume') * 0.90)
+    # reference price
+    ntm = (new_option_activity.get_otm() < 6)
+    atm = (new_option_activity.get_otm() < 3)
+
     # types of unusual activity
-    big_money  = ((high_cost or high_ext_value) and (mid_vol_oi or mid_volume_spike or mid_volume_domin))
-    big_volume = (high_vol_oi or high_volume_spike or high_volume_domin)
+    # 1. very high volume spike
+    big_volume = (high_volume_spike) and (mid_vol_oi or mid_volume_domain or ntm)
+    # 2. huge money
+    big_money = (high_cost or high_ext_value) and (mid_vol_oi or mid_volume_spike or mid_volume_domin or ntm)
+    # 3. typical straightforward pattern
+    typical_pattern = (high_volume_domin) and (atm) and (mid_vol_oi or mid_volume_spike)
     # final round
-    if big_money or big_volume:
+    if big_money or big_volume or typical_pattern:
         # my lucky guy
         return True
     return False
@@ -98,7 +121,7 @@ def hunt():
     from data_source.parse_barchart_activity import get_option_activity
     from analysis.option_activity import OptionActivity
     option_activity_list = get_option_activity(save_file=True, folder='records/raw_option_activity')
-#    infile = os.path.join(root_dir, 'records', 'raw_option_activity', 'OA_190412_110621.txt.gz')
+#    infile = os.path.join(root_dir, 'records', 'raw_option_activity', 'OA_190620_142359.txt.gz')
 #    fin = openw(infile, 'rt')
 #    option_activity_list = fin.readlines()
     # look into each one
@@ -107,6 +130,7 @@ def hunt():
         new_option_activity = OptionActivity()
         new_option_activity.from_activity_str(line)
         if new_option_activity.is_inited():
+            #print (new_option_activity.get_ext_display_str())
             if filter(new_option_activity, option_volume_cache):
                 filtered_list.append(new_option_activity)
                 new_option_activity.serialize('records/option_activity_live')

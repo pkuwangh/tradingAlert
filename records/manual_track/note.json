@@ -30,5 +30,8 @@
     "Act190521DECK190621Put14500" : "2 big trades; 1K on ask + 0.6K at Mid; earning 5/23",
     "Act190521IOVA190621Put1500"  : "many straddles",
     "Act190521SRE190719Call13000" : "many small trades at Mid",
+    "Act190617CNQ190621Call2800"  : "block trade at mid close to ask; concerned too short and otm",
+    "Act190618SRDX190816Call4500" : "2.7K 45 horizontal call spread; buy 8/16 call seel 6/21 call",
+    "Act190619AXGN190719Put2000"  : "2K put at mid; existing OI very flow overall",
     "TheEnd" : "dummy note"
 }

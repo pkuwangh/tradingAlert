@@ -90,6 +90,12 @@ class OptionEffect:
                     vol_oi = 100 * volume / (oi + 0.001)
                     display_str += (' vol=%d (%.1f%%)'
                             % (volume, vol_oi))
+                if len(v) > 5:
+                    # today's total volume
+                    tot_vol = v[5]
+                    tot_vol_vol = 100 * tot_vol / (self.get('volume') + 0.001)
+                    display_str += (' tot_vol=%d (%.1f%%)'
+                            % (tot_vol, tot_vol_oi))
         try:
             (found, sell_date, profit, sell_note) = self.get_transaction_note()
             if found:
@@ -167,6 +173,10 @@ class OptionEffect:
                 else:
                     is_show = True
                 # compare w/ init record
+                if self.get('oi_inject') and volume/self.get('oi_init') > 0.5:
+                    is_show = True
+                #if tot_vol/self.get('volume') > 0.75:
+                #    is_show = True
                 if price/self.get('price_init') > 1.06 or \
                         price/self.get('price_init') < 0.94:
                     price_change = True
@@ -176,6 +186,7 @@ class OptionEffect:
                     self.__values['oi_inject'] = True
                     oi_change = True
                 self.__values['effect'][get_date_str()] = (oi, price, is_show, value, volume)
+
             else:
                 logger.error('%s error quote for %s not found'
                         % (get_time_log(), symbol))

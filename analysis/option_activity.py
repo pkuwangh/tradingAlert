@@ -44,10 +44,11 @@ class OptionActivity:
         return self.__values['symbol'] < other.__values['symbol']
 
     def get_basic_display_str(self):
-        return '%-4s %-4s %s->%s %5.1f->%5.1f' % \
+        return '%-4s %-4s %s->%s %5.1f->%5.1f %4.1f%%' % \
                 (self.__peek('symbol', is_str=True), self.__peek('option_type', is_str=True),
                         self.__peek('deal_time', is_str=True), self.__peek('exp_date', is_str=True),
-                        self.__peek('ref_price'), self.__peek('strike_price'))
+                        self.__peek('ref_price'), self.__peek('strike_price'),
+                        self.get_otm())
 
     def get_display_str(self):
         return '%s vol/oi=%-2.0f cost=%.1fM ext=%.1fM days=%-2d vol(k)=%-4.1f' % \
@@ -74,6 +75,13 @@ class OptionActivity:
                 self.__values['exp_date'] + \
                 self.__values['option_type'] + \
                 str(int(self.__values['strike_price'] * 100))
+
+    def get_otm(self):
+        l_x = 100 * self.get('strike_price') / (self.get('ref_price') + 0.0001)
+        if self.is_call():
+            return (l_x - 100)
+        else:
+            return (100 - l_x)
 
     def is_inited(self):
         return self.__inited

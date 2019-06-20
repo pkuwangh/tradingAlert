@@ -33,7 +33,7 @@ def track_from_act(activity_file, notify_list, force_notify):
 def track_group(activity_dir, force_notify=False):
     # find live-tracked activity
     from concurrent.futures import ThreadPoolExecutor
-    with ThreadPoolExecutor(max_workers=2) as executor:
+    with ThreadPoolExecutor(max_workers=3) as executor:
         notify_list = []
         for item in os.listdir(activity_dir):
             if item.startswith('Act'):
