@@ -116,6 +116,8 @@ venv.bak/
 /records/option_activity_live/*.txt.gz
 #/records/option_activity_hold/*.txt
 #/records/option_activity_hold/*.txt.gz
+/records/option_activity_watch/*.txt
+/records/option_activity_watch/*.txt.gz
 /records/option_activity_dead/*.txt
 /records/option_activity_dead/*.txt.gz
 /records/option_activity_dead/archive/*.txt
