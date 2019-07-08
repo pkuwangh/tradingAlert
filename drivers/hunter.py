@@ -92,7 +92,7 @@ def filter_detail(new_option_activity, option_volume_cache):
 
     # types of unusual activity
     # 1. very high volume spike
-    big_volume = (high_volume_spike) and (mid_vol_oi or mid_volume_domain or ntm)
+    big_volume = (high_volume_spike) and (mid_vol_oi or mid_volume_domin or ntm)
     # 2. huge money
     big_money = (high_cost or high_ext_value) and (mid_vol_oi or mid_volume_spike or mid_volume_domin or ntm)
     # 3. typical straightforward pattern
