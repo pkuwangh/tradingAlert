@@ -41,5 +41,9 @@
     "Act190626HGV190719Call3200"  : "2K 30 call sell + 4K 32 call buy above; 3.8K 32 call on ask",
     "Act190701SCHW190816Call4100" : "7.5K 8/16 sell(?) 40 put buy 41 call; 4.5K 7/19 40 straddle",
     "Act190701RTRX190816Put2000"  : "5K buy 8/16 20 put, sell 7/19 17.5 put; 3.8K sell 9/20 30 call, buy 8/16 20 put, sell 8/16 15 put",
+    "Act190709RF190719Call1600"   : "50K 7/19 otm call buy & 50K 8/16 otm put sell",
+    "Act190718ZBRA190816Put17000" : "~8% drop on the day",
+    "Act190718NEPT190816Call600"  : "10%+ hike pre-market in the day",
+    "Act190718ENPH190816Call2250" : "many small trades close to ask",
     "TheEnd" : "dummy note"
 }
