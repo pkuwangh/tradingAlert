@@ -1,3 +1,37 @@
-install anaconda python
-install package selenium
-download chromedriver; look at which chrome version it supports
+Setup Python & Webdriver
+    install anaconda python
+    install package selenium via conda
+        %% sudo -u <user> -i
+        %% conda install selenium
+    install package pickledb via pip
+        %% which pip
+        %% pip install pickledb
+    download chromedriver; look at which chrome version it supports
+
+Setup Django
+    install virtualenv
+        -- virtual env where software & python packages are installed in a contained space
+        %% conda install virtualenv
+    create Django environment
+        %% virtualenv env
+        %% . env/bin/activate
+    install Django within the environment
+        %% pip install django
+        %% django-admin --version
+
+
+Django
+    model-template-view (MTV) pattern, or on Django the model-view-controller (MVC):
+        -- model is the single definitive source of data
+        -- view describes the data via a python callback function to a specific URL
+        -- template is how Django generates HTML dynamically
+
+Create a Django project
+    start the project
+        %% django-admin startproject testsite
+        -- settings.py describes configuration of Django installation
+        -- urls.py contains a urlpatterns list, that routes and maps URLs to their views
+        -- wsgi.py contains the configuration for the web server gateway interface.
+    start the website
+        %% python manage.py runserver 172.25.19.172:8000
+
