@@ -106,10 +106,9 @@ venv.bak/
 # local
 /logs
 /email/sender.json
-/records/*.db
 /records/cache/option_volume.db
-/records/raw_option_activity/*.txt
-/records/raw_option_activity/*.txt.gz
+#/records/raw_option_activity/*.txt
+#/records/raw_option_activity/*.txt.gz
 /records/raw_option_volume/*.txt
 /records/raw_option_volume/*.txt.gz
 #/records/option_activity_live/*.txt
