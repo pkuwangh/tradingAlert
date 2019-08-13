@@ -7,6 +7,9 @@ Setup Python & Webdriver
         %% which pip
         %% pip install pickledb
     download chromedriver; look at which chrome version it supports
+    to get webdriver working in WSL:
+        -- use Windows version of Chromedriver
+        -- copy to /usr/local/bin/
 
 Setup Django
     install virtualenv

@@ -9,8 +9,8 @@ import time
 import random
 import logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
+logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.WARNING)
 
 root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
 sys.path.append(root_dir)
@@ -19,17 +19,17 @@ from utils.file_rdwr import *
 
 class ChromeDriver:
     # class members
-    binary_path = '/usr/bin/google-chrome'
     driver_path = '/usr/local/bin/chromedriver'
 
     def __init__(self):
         self.chrome_options = Options()
         self.chrome_options.add_argument('--headless')
+        self.chrome_options.add_argument('--disable-extensions')
         self.chrome_options.add_argument('--window-size=1920,1080')
         self.chrome_options.add_argument('--no-proxy-server')
         self.chrome_options.add_argument("--proxy-server='direct://'")
         self.chrome_options.add_argument("--proxy-bypass-list=*")
-        self.chrome_options.binary_location = ChromeDriver.binary_path
+        self.chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
         num_retry = 0
         retry_timeout = 4
         while num_retry < retry_timeout:
@@ -121,6 +121,7 @@ class ChromeDriver:
 
     def close(self):
         self.driver.close()
+        self.driver.quit()
 
 if __name__ == '__main__':
     import os
@@ -142,10 +143,10 @@ if __name__ == '__main__':
     data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
     print (data)
     # option activity
-    url = 'https://www.barchart.com/options/unusual-activity/stocks'
-    eid = 'main-content-column'
-    outfile = os.path.join(temp_dir, 'data_option_activity.txt')
-    data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
-    print (data)
+#    url = 'https://www.barchart.com/options/unusual-activity/stocks'
+#    eid = 'main-content-column'
+#    outfile = os.path.join(temp_dir, 'data_option_activity.txt')
+#    data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
+#    print (data)
     chrome_driver.close()
 
