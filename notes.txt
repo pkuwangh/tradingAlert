@@ -36,5 +36,5 @@ Create a Django project
         -- urls.py contains a urlpatterns list, that routes and maps URLs to their views
         -- wsgi.py contains the configuration for the web server gateway interface.
     start the website
-        %% python manage.py runserver 172.25.19.172:8000
+        %% python manage.py runserver 192.168.1.22:8000
 

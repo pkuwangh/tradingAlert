@@ -128,3 +128,5 @@ venv.bak/
 #/records/option_activity_failure/*.txt.gz
 #/records/auto_track/*.txt
 #/records/auto_track/*.txt.gz
+/django-apps/env_notebook_wsl_v0/bin
+/django-apps/env_notebook_wsl_v0/include
