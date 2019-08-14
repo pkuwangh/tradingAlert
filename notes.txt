@@ -37,4 +37,7 @@ Create a Django project
         -- wsgi.py contains the configuration for the web server gateway interface.
     start the website
         %% python manage.py runserver 192.168.1.22:8000
-
+    start an app
+        %% python manage.py startapp polls
+        -- this creates a directory that will house the poll application
+        -- create a view, map it to a URL and point the root URLconf at the polls.urls
