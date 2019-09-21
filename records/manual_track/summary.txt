@@ -3,6 +3,7 @@ general:
         very high volume spike:
             FIS: vol/avg = 20, vol/oi = 38
             NRG: vol/avg = 12, 3.2M cost
+            BAH: vol/avg = 13, ext=0.6M
         huge money:
             NRG: vol/avg = 12, 3.2M cost
             DVA: vol/avg = 2.7, 2.0M cost 
@@ -13,6 +14,9 @@ general:
             FLEX: 10 -> 10
         sell put & buy call:
             CERN: sell otm put buy otm call, ahead of ER
+        somehow worked:
+            TJX: vol/avg=3.1, 52.9->55 call, cost=0.5M, 28 days
+            SGMO: vol/avg=4.4, 9.7->10 call, cost=0.6M, 24 days
     negative side:
         hot topic:
             TSM: call w/ vol/oi only at 2.8
@@ -46,6 +50,12 @@ general:
             LXRX: 7.8 -> 9.0 call
             BBD: 11.9 -> 13 call
             SE: 23 -> 30 call
+            PSTG: 16.6 -> 17.5 call, +5.3%, vol/avg=5.7
+            DCPH: 23.1 -> 25 call, +8%, vol/avg=5.5; half of total volume
+            LEN: 48.4 -> 52.5 call, +8.5%, vol/avg=4.9; half of total volume
+        massive straddle:
+            LYB: 40K call + 40K put, avg=5.4K; MM is not gonna let you go
+            QTWO: 1.5K call + 1.5K put, avg=0.1K
         mixed trade:
             HST: vol=11, tot=22
             LSCC: vol=4.8, tot=8.5
@@ -64,6 +74,7 @@ general:
             LIN: ntm, vol=5.8, tot=12.4; direction is correct
             DVA: atm, vol/avg only 2.7
             IAC: ntm/otm, vol/avg=3.7, 0.3M ext
+            BOOT: ntm/otm, vol/avg=4.3, 0.6M ext, 1.8 vs 2.2 total
         too short: more likely to be a bet
             PEGI: 10 days; direction is correct though
             WU: 10 days
@@ -76,6 +87,10 @@ general:
         big move on the day: bet on a rebound:
             GIII: call, down 8.7% on the day
             CDNA: call, down 8% on the day
+        complicated trade strategy:
+            HGV: sell 30 call, buy 2x 32 call; to collect premium while to profit on huge jump?
+            RF: 7/19 otm call buy + 8/16 otm put sell
+            SRDX: buy 8/16 call sell 6/21 call
 
 call:
     positive side:
@@ -89,6 +104,7 @@ call:
             IDTI: atm, volume spike, big money, 30 days; must be informed trade
             GPC: ntm, 30 days; - 0.2M ext, vol/avg=2.7
             KAR: ntm/otm, volume spike, somewhat big money, 45 days, most volume on this contract
+            RPM: 6.7% otm, huge volume spike, 0.3M, 57 days, most volume on this contract
         straightforward pattern, somewhat profitable:
             EYE: volume spike, most volume on this contract; - itm, 0.3M ext, 17 days, direction is correct
             MX: volume spike; - otm too much, 0.3M ext, 17 days, mixed trades
@@ -97,8 +113,9 @@ call:
             MX: ntm, most volume on this contract; - vol/oi=2, 0.3M ext; direction is correct at a point
             BOX: volume spike, huge money, most volume on this contract; - ntm/otm; profitable at a point
             PTCT: ntm, 5.1 volume spike, 0.4M ext, 37 days, most volume on this contract; up 5.6% on the day
-            CFG: atm, 4.9 volume spike, 0.7M ext, 35 days; - 4.5K striddle; profitable at a point
+            CFG: atm, 4.9 volume spike, 0.7M ext, 35 days; - 4.5K straddle; profitable at a point
             CFG: atm, 3.4 volume spike, 0.3M ext, 37 days; continuous money flow
+            PAYX: atm, 6.3 volume spike, 0.4M ext, 14 days
     negative side:
 
 put:
