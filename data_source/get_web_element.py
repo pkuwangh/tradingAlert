@@ -21,11 +21,11 @@ class ChromeDriver:
     # class members
     driver_path = '/usr/local/bin/chromedriver'
 
-    def __init__(self):
+    def __init__(self, width=1920, height=1080):
         self.chrome_options = Options()
         self.chrome_options.add_argument('--headless')
         self.chrome_options.add_argument('--disable-extensions')
-        self.chrome_options.add_argument('--window-size=1920,1080')
+        self.chrome_options.add_argument('--window-size=%u,%u' % (width, height))
         self.chrome_options.add_argument('--no-proxy-server')
         self.chrome_options.add_argument("--proxy-server='direct://'")
         self.chrome_options.add_argument("--proxy-bypass-list=*")

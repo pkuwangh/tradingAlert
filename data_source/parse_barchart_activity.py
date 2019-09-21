@@ -57,7 +57,7 @@ def lookup_option_activity():
     show_all = 'a.show-all'
     buttons = [show_all]
     try:
-        chrome_driver = ChromeDriver()
+        chrome_driver = ChromeDriver(width=3840, height=3840)
         outfile = os.path.join(root_dir, 'logs', 'data_option_activity.txt')
         web_data = chrome_driver.download_data(url=url, button_css_sel=buttons, element_id=eid, outfile=outfile)
     except:
