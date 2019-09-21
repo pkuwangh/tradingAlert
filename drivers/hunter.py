@@ -15,13 +15,13 @@ def filter_base(new_option_activity, option_volume_cache):
 #    if 'ZION' in new_option_activity.get('symbol'):
 #        print (new_option_activity.get_display_str())
     # parameters
-    thd_vol_oi = 3
-    thd_tot_cost = 200
-    thd_ext_value = 200
+    thd_vol_oi = 5
+    thd_tot_cost = 300
+    thd_ext_value = 300
     thd_d2e_min = 2
-    thd_d2e_max = 61
-    thd_otm = 10
-    thd_vol_spike = 3
+    thd_d2e_max = 91
+    thd_otm = 6
+    thd_vol_spike = 6
     thd_vol_dist = 0.45
     # stage 1: simple filtering
     # ----------------------------------------------------------------
@@ -77,14 +77,12 @@ def filter_base(new_option_activity, option_volume_cache):
 def filter_detail(new_option_activity, option_volume_cache):
     # it should be extreme in some aspect(s)
     # volume on the contract
-    mid_vol_oi  = (new_option_activity.get('vol_oi') > 5)
-    high_vol_oi = (new_option_activity.get('vol_oi') > 10)
-    # cost
-    high_cost = (new_option_activity.get('total_cost') > 700)
-    high_ext_value = (new_option_activity.get('ext_value') > 400)
+    mid_vol_oi  = (new_option_activity.get('vol_oi') > 4)
     # volume spike
-    mid_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 4)
-    high_volume_spike = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 8)
+    low_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 5)
+    mid_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 8)
+    high_volume_spike = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 10)
+    high_totvol_spike = (new_option_activity.get('option_volume') > new_option_activity.get('avg_option_volume') * 12)
     # volume today
     mid_volume_domin  = (new_option_activity.get('volume') > new_option_activity.get('option_volume') * 0.75)
     high_volume_domin = (new_option_activity.get('volume') > new_option_activity.get('option_volume') * 0.90)
@@ -94,13 +92,11 @@ def filter_detail(new_option_activity, option_volume_cache):
 
     # types of unusual activity
     # 1. very high volume spike
-    big_volume = (high_volume_spike) and (mid_vol_oi or mid_volume_domin or ntm)
-    # 2. huge money
-    big_money = (high_cost or high_ext_value) and (mid_vol_oi or mid_volume_spike or mid_volume_domin or ntm)
-    # 3. typical straightforward pattern
-    typical_pattern = (high_volume_domin) and (atm) and (mid_vol_oi or mid_volume_spike)
+    big_volume = (high_volume_spike or (low_volume_spike and high_totvol_spike)) and (mid_vol_oi or mid_volume_domin or ntm)
+    # 2. typical straightforward pattern
+    typical_pattern = (high_volume_domin) and (atm) and (mid_vol_oi) and (mid_volume_spike)
     # final round
-    if big_money or big_volume or typical_pattern:
+    if big_volume or typical_pattern:
         # my lucky guy
         return True
     return False
