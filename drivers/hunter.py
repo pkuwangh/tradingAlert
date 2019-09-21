@@ -17,11 +17,11 @@ def filter_base(new_option_activity, option_volume_cache):
     # parameters
     thd_vol_oi = 5
     thd_tot_cost = 300
-    thd_ext_value = 300
+    thd_ext_value = 200
     thd_d2e_min = 2
     thd_d2e_max = 91
-    thd_otm = 6
-    thd_vol_spike = 6
+    thd_otm = 8
+    thd_vol_spike = 5
     thd_vol_dist = 0.45
     # stage 1: simple filtering
     # ----------------------------------------------------------------
