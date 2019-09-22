@@ -29,7 +29,7 @@ Django
         -- view describes the data via a python callback function to a specific URL
         -- template is how Django generates HTML dynamically
 
-Create a Django project
+Create a Django project/app
     start the project
         %% django-admin startproject testsite
         -- settings.py describes configuration of Django installation
@@ -41,3 +41,34 @@ Create a Django project
         %% python manage.py startapp polls
         -- this creates a directory that will house the poll application
         -- create a view, map it to a URL and point the root URLconf at the polls.urls
+
+Database w/ Django
+    "migrate"
+        -- create the tables in the database for applications listed in settings.py
+        %% python manage.py migrate
+    create models
+        -- define models, i.e. the datebase layout w/ additional metadata
+        -- django can create a database schema & a python database-access API
+    activate models
+        -- to include the app in the project, add a reference to its configuration class in settings.py
+        %% python manage.py makemigrations polls
+        %% python manage.py migrate
+    play w/ API in a python shell
+        %% python manage.py shell
+        >> from polls.models import Choice,Question
+        >> Question.objects.all()
+        >> from django.utils import timezone
+        >> q = Question(question_text="what is new?", pub_date=timezone.now())
+        >> q.save()   # explicitly save the object into database
+        >> q.id
+        >> q.question_text
+        >> Question.objects.all()
+        >> Question.objects.filter(id=1)
+        >> Question.objects.filter(question_text__startswith='what')
+        >> Question.objects.filter(pub_date__year=timezone.now().year)
+        >> q = Question.objects.get(pk=1)
+        >> q.choice_set.all()
+        >> q.choice_set().create(choice_text='not much', votes=0)
+        >> c = q.choice_set.create(choice_set='just hacking again', votes=0)
+        >> c.question
+
