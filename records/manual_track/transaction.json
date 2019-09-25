@@ -16,5 +16,7 @@
     "Act190701SCHW190816Call4100" : ["190716", 12, "+4%, buy 139x2 sell 145x2"],
     "Act190710CSII190719Call4500" : ["190719", -150, "-83%, buy 90x2 sell 15x2"],
     "Act190712CCJ190719Call1100"  : ["190719", -56, "-100%, buy 14x4 sell 0x4"],
+    "Act190701SCHW190816Call4100" : ["190716", 12, "+4%, buy 140x2 sell 145x2"],
+    "Act190701SCHW190816Call4100" : ["190806", 100, "+56%, buy 45x4 sell 95x2+45x2"],
     "TheEnd" : "dummy note"
 }
