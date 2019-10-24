@@ -46,5 +46,9 @@
     "Act190718NEPT190816Call600": "10%+ hike pre-market in the day",
     "Act190718ZBRA190816Put17000": "~8% drop on the day",
     "Act190924SAN191220Call400": "many small trades, top 2 at ask, others at buy; also large put OI on same exp day",
+    "Act191014GOSS191115Put1500": "6K 15/12.5 put spread; over earning report on 11/6",
+    "Act191022HII191220Call23000": "aggressive call buying w/ 1.9K block trades & many interMarketSweep trades; cost at 2.8",
+    "Act191022ZAGG191220Call700": "too late; exploded right after big trades",
+    "Act191023PBI191115Call500": "many small trades; more on bid side although spread is small, cannot really tell",
     "TheEnd": "dummy note"
 }

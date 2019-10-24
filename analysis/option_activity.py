@@ -41,7 +41,7 @@ class OptionActivity:
         return self.__inited
 
     def __lt__(self, other):
-        return self.__values['symbol'] < other.__values['symbol']
+        return self.__values['deal_time'] < other.__values['deal_time']
 
     def get_basic_display_str(self):
         return '%-4s %-4s %s->%s %5.1f->%5.1f %4.1f%%' % \

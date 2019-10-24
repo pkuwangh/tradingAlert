@@ -88,7 +88,7 @@ def lookup_option_breakdown(symbol, save_file=False, folder='logs'):
 
 def lookup_option_volume(symbol, save_file=False, folder='logs'):
     # read web data
-    url = 'https://marketchameleon.com/Overview/%s/' % (symbol)
+    url = 'https://marketchameleon.com/Overview/%s/DailyCharts' % (symbol)
     eid = 'daily_chart_extended_stats_div'
     try:
         chrome_driver = ChromeDriver()

@@ -23,7 +23,7 @@ class OptionEffect:
 
     def __lt__(self, other):
         if self.get('option_type') == other.get('option_type'):
-            return self.get('exp_date') < other.get('exp_date')
+            return self.get('deal_time') < other.get('deal_time')
         else:
             return self.get('option_type') == 'C'
 

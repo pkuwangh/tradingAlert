@@ -80,7 +80,7 @@ def filter_detail(new_option_activity, option_volume_cache):
     mid_vol_oi  = (new_option_activity.get('vol_oi') > 4)
     # volume spike
     low_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 5)
-    mid_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 8)
+    mid_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 7)
     high_volume_spike = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 10)
     high_totvol_spike = (new_option_activity.get('option_volume') > new_option_activity.get('avg_option_volume') * 12)
     # volume today
