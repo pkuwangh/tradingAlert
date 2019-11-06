@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 import os
+import platform
 import sys
 import time
 import random
@@ -18,10 +19,11 @@ from utils.datetime_string import *
 from utils.file_rdwr import *
 
 class ChromeDriver:
-    # class members
-    driver_path = '/usr/local/bin/chromedriver'
-
     def __init__(self, width=1920, height=1080):
+        if platform.system() == 'Darwin':
+            self.driver_path = '/Users/haowang3/workspace/downloads/chromedriver'
+        else:
+            self.driver_path = '/usr/local/bin/chromedriver'
         self.chrome_options = Options()
         self.chrome_options.add_argument('--headless')
         self.chrome_options.add_argument('--disable-extensions')
@@ -30,11 +32,12 @@ class ChromeDriver:
         self.chrome_options.add_argument("--proxy-server='direct://'")
         self.chrome_options.add_argument("--proxy-bypass-list=*")
         self.chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        # init the webdriver
         num_retry = 0
         retry_timeout = 4
         while num_retry < retry_timeout:
             try:
-                self.driver = webdriver.Chrome(executable_path=ChromeDriver.driver_path,
+                self.driver = webdriver.Chrome(executable_path=self.driver_path,
                         options=self.chrome_options)
                 if num_retry > 0:
                     logger.info('finally succeed after retrying %d times' % (num_retry))
