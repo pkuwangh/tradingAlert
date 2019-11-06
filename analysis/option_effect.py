@@ -50,7 +50,7 @@ class OptionEffect:
     def get_display_str(self, color=True):
         # option activity string
         display_str = '%s%s%s' % \
-                (('\033[33;5m' if color else ''),
+                (('\033[33;3m' if color else ''),
                         self.get('display_str'),
                         ('\033[0m' if color else ''))
         # read note
@@ -100,7 +100,7 @@ class OptionEffect:
             (found, sell_date, profit, sell_note) = self.get_transaction_note()
             if found:
                 display_str += ('\n%s    ## %s%d, %s on %s%s'
-                        % (('' if not color else ('\033[32;5m' if profit > 0 else '\033[31;5m')),
+                        % (('' if not color else ('\033[32;3m' if profit > 0 else '\033[31;3m')),
                             ('+' if profit >= 0 else ''),
                             profit, sell_note, sell_date,
                             ('\033[0m' if color else '')))
