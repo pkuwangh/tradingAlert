@@ -11,7 +11,7 @@ sys.path.append(root_dir)
 from utils.datetime_string import *
 from utils.file_rdwr import *
 
-def print_option_effect(fileset):
+def print_option_effect(fileset, expired=False):
     from analysis.option_activity import OptionActivity
     from analysis.option_effect import OptionEffect
     from analysis.option_effect import OptionEffectFactory
@@ -35,7 +35,8 @@ def print_option_effect(fileset):
         if oe_filename and os.path.exists(oe_filename):
             try:
                 option_effect.unserialize(oe_filename)
-                oe_list.append(option_effect)
+                if not expired or option_effect.get_remaining_days() < 0:
+                    oe_list.append(option_effect)
             except Exception as e:
                 logger.error('error unserializing %s: %s' % (oe_filename, e))
     oe_list.sort()
@@ -52,7 +53,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--infile', '-f', nargs='+', required=True,
             help='option effect files to display')
+    parser.add_argument('--expired', '-e', action='store_true',
+            help='only show expired ones')
 
     args = parser.parse_args()
-    print_option_effect(args.infile)
+    print_option_effect(args.infile, args.expired)
 
