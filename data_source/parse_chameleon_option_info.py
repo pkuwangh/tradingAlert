@@ -24,21 +24,27 @@ def scan_option_volume(symbol, option_total_table, option_info):
     logger.debug('%s lookup %s option volume summary' % (get_time_log(), symbol))
     status_bad = False
     started = False
+    today = False
+    average = False
     for line in option_total_table:
         items = line.split()
-        if 'Volume' in line:
+        if started and today:
+            today = False
+            try:
+                option_info['vol_today'] = int(items[-1].replace(',', ''))
+            except:
+                status_bad = True
+        if started and average:
+            average = False
+            try:
+                option_info['vol_3mon'] = int(items[-1].replace(',', ''))
+            except:
+                status_bad = True
+        if started and '90-Day Avg' in line:
+            average = True
+        if 'Option' in line:
             started = True
-        if started:
-            if 'Today' in line:
-                try:
-                    option_info['vol_today'] = int(items[-1].replace(',', ''))
-                except:
-                    status_bad = True
-            elif '3 Month' in line:
-                try:
-                    option_info['vol_3mon'] = int(items[-1].replace(',', ''))
-                except:
-                    status_bad = True
+            today = True
     if status_bad:
         logger.error('%s error scanning %s option; resulting vol_today=%d vol_3mon=%d\n'
                 % (get_time_log(), symbol,
@@ -88,8 +94,8 @@ def lookup_option_breakdown(symbol, save_file=False, folder='logs'):
 
 def lookup_option_volume(symbol, save_file=False, folder='logs'):
     # read web data
-    url = 'https://marketchameleon.com/Overview/%s/DailyCharts' % (symbol)
-    eid = 'daily_chart_extended_stats_div'
+    url = 'https://marketchameleon.com/Overview/%s' % (symbol)
+    eid = 'symov_stats_subitem'
     try:
         chrome_driver = ChromeDriver()
         web_data = chrome_driver.download_data(url=url, element_id=eid)

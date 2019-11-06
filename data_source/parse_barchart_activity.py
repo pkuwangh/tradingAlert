@@ -87,13 +87,19 @@ def get_option_activity(save_file=False, folder='logs'):
             time.sleep(10*random.random())
             continue
     # save a copy
-    if save_file:
+    if save_file and num_retry < retry_timeout:
         file_dir = os.path.abspath(os.path.dirname(__file__))
         root_dir = '/'.join(file_dir.split('/')[:-1])
         meta_data_dir = os.path.join(root_dir, folder)
         if not os.path.exists(meta_data_dir):
             os.makedirs(meta_data_dir)
-        today_time_str = get_datetime_str(datetime.datetime.now())
+        # try to remove duplicates
+        today_str = get_date_str()
+        for item in os.listdir(meta_data_dir):
+            if item.startswith('OA_%s' % (today_str)):
+                os.remove(os.path.join(meta_data_dir, item))
+        # write new one
+        today_time_str = get_datetime_str()
         filename = os.path.join(meta_data_dir, 'OA_%s.txt.gz' % (today_time_str))
         with openw(filename, 'wt') as fout:
             fout.write('\n'.join(option_activity_list))

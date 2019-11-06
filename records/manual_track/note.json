@@ -50,5 +50,8 @@
     "Act191022HII191220Call23000": "aggressive call buying w/ 1.9K block trades & many interMarketSweep trades; cost at 2.8",
     "Act191022ZAGG191220Call700": "too late; exploded right after big trades",
     "Act191023PBI191115Call500": "many small trades; more on bid side although spread is small, cannot really tell",
+    "Act191030EVOP191115Put3000": "1.8K put close to buy side 2.35; spread is big; avg vol very low",
+    "Act191030GDDY191220Call7000": "5.8K block trade at buy side 1.4",
+    "Act191030KAR191115Put2500": "9.7K block trade on ask 0.75 w/ large spread; a number of small trades on ask",
     "TheEnd": "dummy note"
 }
