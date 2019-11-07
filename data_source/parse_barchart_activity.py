@@ -51,11 +51,11 @@ def parse_option_activity(infile):
 
 def lookup_option_activity():
     # read web data
-    url = 'https://www.barchart.com/options/unusual-activity/stocks'
+    url = 'https://www.barchart.com/options/unusual-activity/stocks?page=all'
     eid = 'main-content-column'
-#    show_all = 'a.show-all.ng-scope'
     show_all = 'a.show-all'
-    buttons = [show_all]
+    #buttons = [show_all]
+    buttons = None
     try:
         chrome_driver = ChromeDriver(width=3840, height=3840)
         outfile = os.path.join(root_dir, 'logs', 'data_option_activity.txt')
