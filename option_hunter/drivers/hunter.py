@@ -15,12 +15,12 @@ def filter_base(new_option_activity, option_volume_cache):
 #    if 'ZION' in new_option_activity.get('symbol'):
 #        print (new_option_activity.get_display_str())
     # parameters
-    thd_vol_oi = 5
-    thd_tot_cost = 300
-    thd_ext_value = 200
+    thd_vol_oi = 1
+    thd_tot_cost = 200
+    thd_ext_value = 100
     thd_d2e_min = 2
     thd_d2e_max = 91
-    thd_otm = 8
+    thd_otm = 10
     thd_vol_spike = 5
     thd_vol_dist = 0.45
     # stage 1: simple filtering
@@ -79,10 +79,10 @@ def filter_detail(new_option_activity, option_volume_cache):
     # volume on the contract
     mid_vol_oi  = (new_option_activity.get('vol_oi') > 4)
     # volume spike
-    low_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 5)
-    mid_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 7)
-    high_volume_spike = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 10)
-    high_totvol_spike = (new_option_activity.get('option_volume') > new_option_activity.get('avg_option_volume') * 12)
+    low_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 4)
+    mid_volume_spike  = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 6)
+    high_volume_spike = (new_option_activity.get('volume') > new_option_activity.get('avg_option_volume') * 8)
+    high_totvol_spike = (new_option_activity.get('option_volume') > new_option_activity.get('avg_option_volume') * 10)
     # volume today
     mid_volume_domin  = (new_option_activity.get('volume') > new_option_activity.get('option_volume') * 0.75)
     high_volume_domin = (new_option_activity.get('volume') > new_option_activity.get('option_volume') * 0.90)
