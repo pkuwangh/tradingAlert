@@ -53,5 +53,6 @@
     "Act191030EVOP191115Put3000": "1.8K put close to buy side 2.35; spread is big; avg vol very low",
     "Act191030GDDY191220Call7000": "5.8K block trade at buy side 1.4",
     "Act191030KAR191115Put2500": "9.7K block trade on ask 0.75 w/ large spread; a number of small trades on ask",
+    "Act191204JBLU191220Call2000": "a number of calls at sizes of 500~3000; hard to tell buy vs. sell",
     "TheEnd": "dummy note"
 }
