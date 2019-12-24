@@ -99,7 +99,8 @@ def lookup_option_volume(symbol, save_file=False, folder='logs'):
     try:
         chrome_driver = ChromeDriver()
         web_data = chrome_driver.download_data(url=url, element_id=eid)
-    except:
+    except Exception as e:
+        logger.debug('%s got exception %s' % (get_time_log(), str(e)))
         web_data = None
     try:
         chrome_driver.close()
@@ -111,6 +112,7 @@ def lookup_option_volume(symbol, save_file=False, folder='logs'):
     option_info['vol_3mon'] = -1
     # something wrong
     if web_data is None:
+        logger.debug('%s web_data is None from chameleon for %s' % (get_time_log(), symbol))
         return (False, option_info)
     # lookup
     found = scan_option_volume(symbol, web_data.splitlines(), option_info)

@@ -105,11 +105,11 @@ class ChromeDriver:
             if element and element.text and len(element.text) > 1:
                 break
             else:
-                logger.warning('did not get the proper element? element=%d text=%d len(text)=%d (retry=%u)' %
+                logger.warning('did not get the proper element? element=%d text=%d len(text)=%d (retry=%u)' % (
                         (1 if element else 0),
                         (1 if element and element.text else 0),
                         (len(element.text) if element and element.text else 0),
-                        (num_retry))
+                        (num_retry)))
                 time.sleep(30)
                 continue
         # output & return
@@ -140,16 +140,22 @@ if __name__ == '__main__':
     # create chrome driver
     chrome_driver = ChromeDriver()
     # option chain
-    url = 'https://finance.yahoo.com/quote/MSFT/options?date=1542326400'
-    eid = 'Col1-1-OptionContracts-Proxy'
-    outfile = os.path.join(temp_dir, 'data_msft_option_chain.txt')
-    data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
-    print (data)
+#    url = 'https://finance.yahoo.com/quote/MSFT/options?date=1542326400'
+#    eid = 'Col1-1-OptionContracts-Proxy'
+#    outfile = os.path.join(temp_dir, 'data_msft_option_chain.txt')
+#    data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
+#    print (data)
     # option activity
 #    url = 'https://www.barchart.com/options/unusual-activity/stocks'
 #    eid = 'main-content-column'
 #    outfile = os.path.join(temp_dir, 'data_option_activity.txt')
 #    data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
 #    print (data)
+    # option volume
+    url = 'https://marketchameleon.com/Overview/NVDA'
+    eid = 'symov_stats_subitem'
+    outfile = os.path.join(temp_dir, 'data_option_volume.txt')
+    data = chrome_driver.download_data(url=url, element_id=eid, outfile=outfile)
+    print (data)
     chrome_driver.close()
 
