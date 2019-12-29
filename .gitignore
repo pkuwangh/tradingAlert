@@ -130,3 +130,5 @@ venv.bak/
 #/option_hunter/records/auto_track/*.txt.gz
 /option_hunter/django-apps/env_notebook_wsl_v0/bin
 /option_hunter/django-apps/env_notebook_wsl_v0/include
+
+/option_board/logs
