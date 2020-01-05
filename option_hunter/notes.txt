@@ -1,7 +1,8 @@
 Setup Python & Webdriver
     install anaconda python
     install package selenium via conda
-        %% sudo -u <user> -i
+        ## sudo -u <user> -i
+        %% which conda
         %% conda install selenium
     install package pickledb via pip
         %% which pip

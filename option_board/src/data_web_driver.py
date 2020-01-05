@@ -4,21 +4,18 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
 import platform
-import sys
 import time
 import random
 import logging
 
-from utils_file import *
 from utils_datetime import *
+from utils_file import *
+from utils_logging import *
 
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 logging.getLogger('selenium.webdriver.remote.remote_connection').setLevel(logging.WARNING)
-
-root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
-sys.path.append(root_dir)
 
 
 class ChromeDriver:
@@ -37,7 +34,6 @@ class ChromeDriver:
         self.chrome_options.add_argument("--proxy-bypass-list=*")
         self.chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-
     def __enter__(self):
         logger.debug('ChromeDriver entering')
         num_retry = 0
@@ -48,6 +44,7 @@ class ChromeDriver:
                 self.driver = webdriver.Chrome(
                         executable_path=self.driver_path,
                         options=self.chrome_options)
+                break
             except Exception as e:
                 logger.warning('error %s when init driver (retry=%d/%d)'
                         % (str(e), num_retry, retry_timeout))
@@ -55,13 +52,11 @@ class ChromeDriver:
                 continue
         return self
 
-
     def __exit__(self, *args):
         logger.debug('ChromeDriver exiting')
         if self.driver:
             self.driver.close()
             self.driver.quit()
-
 
     def download_data(self, url, \
             button_css=None, element_id=None, element_class=None, \
@@ -89,7 +84,7 @@ class ChromeDriver:
                 all_seq_good = True
                 for button in button_css:
                     try:
-                        button = self.driver.find_element_by_css_selector(button).click()
+                        self.driver.find_element_by_css_selector(button).click()
                         time.sleep(1*random.random())
                     except Exception as e:
                         logger.warning('error %s when getting button=%s (retry=%d/%d)'
@@ -99,7 +94,7 @@ class ChromeDriver:
                         break
                 if not all_seq_good:
                     continue
-            time.sleep(1*random.random())
+                time.sleep(1*random.random())
             # get the target element
             if element_id:
                 try:
@@ -129,7 +124,7 @@ class ChromeDriver:
                             (len(element.text) if element and element.text else 0),
                             (num_retry, retry_timeout) )
                         )
-                time.sleep(10)
+                time.sleep(5)
                 continue
         # output & return
         if element:
@@ -143,21 +138,20 @@ class ChromeDriver:
 
 
 if __name__ == '__main__':
-    metadata_dir = os.path.join(root_dir, 'logs')
-    if not os.path.exists(metadata_dir):
-        os.makedirs(metadata_dir)
-    log_file = os.path.join(metadata_dir, 'log.' + __file__.split('/')[-1])
-    logging.basicConfig(filename=log_file, filemode='w')
-    logging.getLogger().addHandler(logging.StreamHandler())
+    metadata_dir = setup_metadata_dir()
+    setup_logger(module_name=__file__.split('/')[-1])
     logger.setLevel(logging.DEBUG)
     # testing
-    with ChromeDriver() as driver:
+    with ChromeDriver() as browser:
         url = 'https://finance.yahoo.com/quote/AMD/options'
         eid = 'Col1-1-OptionContracts-Proxy'
-        outfile = os.path.join(metadata_dir, 'data_amd_option_chain.txt')
-        try:
-            data = driver.download_data(url=url, element_id=eid, outfile=outfile)
-        except:
-            pass
-        else:
-            print(data)
+        outfile = os.path.join(metadata_dir, 'data_amd_yahoo_option_chain.txt')
+        print(browser.download_data(url=url, element_id=eid, outfile=outfile))
+        url = 'https://www.barchart.com/stocks/quotes/AMD/options'
+        eclass = 'filters'
+        outfile = os.path.join(metadata_dir, 'data_amd_barchart_option_date.txt')
+        print(browser.download_data(url=url, element_class=eclass, outfile=outfile))
+        url = 'https://www.barchart.com/stocks/quotes/AMD/options?moneyness=allRows&expiration=2020-01-17'
+        eclass = 'bc-futures-options-quotes-totals'
+        outfile = os.path.join(metadata_dir, 'data_amd_barchart_option_volume.txt')
+        print(browser.download_data(url=url, element_class=eclass, outfile=outfile))
