@@ -48,7 +48,7 @@ class ChromeDriver:
             except Exception as e:
                 logger.warning('error %s when init driver (retry=%d/%d)'
                         % (str(e), num_retry, retry_timeout))
-                time.sleep(5)
+                time.sleep(5 * num_retry)
                 continue
         return self
 
@@ -59,7 +59,10 @@ class ChromeDriver:
             self.driver.quit()
 
     def download_data(self, url, \
-            button_css=None, element_id=None, element_class=None, \
+            wait_base=1,
+            button_css=None, \
+            pre_element_id=None, pre_element_class=None, \
+            element_id=None, element_class=None, \
             outfile=None):
         logger.info('%s download data from %s' % (get_time_log(), url))
         num_retry = 0
@@ -76,44 +79,43 @@ class ChromeDriver:
                 if self.driver is None:
                     break
                 else:
-                    time.sleep(5)
+                    time.sleep(5 * num_retry)
                     continue
-            time.sleep(1*random.random())
+            time.sleep(wait_base * (random.random() + 1))
             # click a button if needed
             if button_css:
                 all_seq_good = True
                 for button in button_css:
                     try:
                         self.driver.find_element_by_css_selector(button).click()
-                        time.sleep(1*random.random())
+                        time.sleep(wait_base * (random.random() + 1))
                     except Exception as e:
                         logger.warning('error %s when getting button=%s (retry=%d/%d)'
                                 % (str(e), button, num_retry, retry_timeout))
                         all_seq_good = False
-                        time.sleep(5)
+                        time.sleep(5 * num_retry)
                         break
                 if not all_seq_good:
                     continue
-                time.sleep(1*random.random())
             # get the target element
-            if element_id:
-                try:
+            try:
+                # touch the pre-req element
+                if pre_element_id:
+                    self.driver.find_element_by_id(pre_element_id)
+                if pre_element_class:
+                    self.driver.find_element_by_class_name(pre_element_class)
+                # read actual target element
+                if element_id:
                     element = self.driver.find_element_by_id(element_id)
-                except Exception as e:
-                    logger.warning('error %s when getting element=%s (retry=%d/%d)'
-                            % (str(e), element_id, num_retry, retry_timeout))
-                    time.sleep(5)
-                    continue
-            elif element_class:
-                try:
+                elif element_class:
                     element = self.driver.find_element_by_class_name(element_class)
-                except Exception as e:
-                    logger.warning('error %s when getting class=%s (retry=%d/%d)'
-                            % (str(e), element_class, num_retry, retry_timeout))
-                    time.sleep(5)
-                    continue
-            else:
-                logger.error('Do not know how to find element')
+                else:
+                    logger.error('Do not know how to find element')
+            except Exception as e:
+                logger.warning('error %s when getting element (retry=%d/%d)'
+                        % (str(e), num_retry, retry_timeout))
+                time.sleep(5 * num_retry)
+                continue
             # done if found element
             if element and element.text and len(element.text) > 1:
                 break
@@ -124,7 +126,7 @@ class ChromeDriver:
                             (len(element.text) if element and element.text else 0),
                             (num_retry, retry_timeout) )
                         )
-                time.sleep(5)
+                time.sleep(5 * num_retry)
                 continue
         # output & return
         if element:
