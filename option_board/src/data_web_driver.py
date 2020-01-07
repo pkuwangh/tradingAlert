@@ -4,13 +4,14 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
 import platform
+import sys
 import time
 import random
 import logging
 
-from utils_datetime import *
-from utils_file import *
-from utils_logging import *
+from utils_datetime import get_time_log
+from utils_file import openw
+from utils_logging import setup_logger, setup_metadata_dir
 
 
 logger = logging.getLogger(__name__)
@@ -124,7 +125,7 @@ class ChromeDriver:
                         % ( (1 if element else 0),
                             (1 if element and element.text else 0),
                             (len(element.text) if element and element.text else 0),
-                            (num_retry, retry_timeout) )
+                            num_retry, retry_timeout )
                         )
                 time.sleep(5 * num_retry)
                 continue
@@ -136,7 +137,7 @@ class ChromeDriver:
             return element.text
         else:
             logger.error('%s failed to get element from %s' % (get_time_log(), url))
-            raise
+            raise sys.exc_info()[1]
 
 
 if __name__ == '__main__':

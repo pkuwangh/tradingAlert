@@ -3,11 +3,12 @@
 import json
 import logging
 import re
+import sys
 import time
 
 from data_packet import DailyOptionInfo
 from data_web_driver import ChromeDriver
-from utils_logging import *
+from utils_logging import setup_logger
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -74,16 +75,16 @@ def read_daily_option_info(browser, symbol, use_barchart=True):
                 else:
                     break
             if num_retry >= retry_timeout:
-                raise
+                raise sys.exc_info()[1]
         return option_info
     else:
         logger.error('other data sources not implemented')
-        raise
+        raise ValueError('use_barchart={}'.format(use_barchart))
 
 
 if __name__ == '__main__':
     setup_logger(module_name=__file__.split('/')[-1])
     logger.setLevel(logging.DEBUG)
     with ChromeDriver() as browser:
-        option_info = read_daily_option_info(browser, 'CO')
+        option_info = read_daily_option_info(browser, 'ASHR')
         print(json.dumps(option_info.__dict__, indent=4))
