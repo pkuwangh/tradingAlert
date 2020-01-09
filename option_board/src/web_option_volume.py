@@ -7,7 +7,7 @@ import sys
 import time
 
 from data_packet import DailyOptionInfo
-from data_web_driver import ChromeDriver
+from web_chrome_driver import ChromeDriver
 from utils_logging import setup_logger
 
 logger = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ def read_daily_option_info(browser, symbol, use_barchart=True):
                 num_retry += 1
                 try:
                     web_data = browser.download_data(
-                            url=url, wait_base=1 + 4 * (num_retry - 1),
+                            url=url, wait_base=2 * num_retry,
                             pre_element_class=pre_eclass, element_class=eclass)
                     parse_daily_option_info(option_info, web_data.splitlines())
                 except Exception as e:
@@ -83,7 +83,7 @@ def read_daily_option_info(browser, symbol, use_barchart=True):
 
 
 if __name__ == '__main__':
-    setup_logger(module_name=__file__.split('/')[-1])
+    setup_logger(__file__)
     logger.setLevel(logging.DEBUG)
     with ChromeDriver() as browser:
         option_info = read_daily_option_info(browser, 'ASHR')

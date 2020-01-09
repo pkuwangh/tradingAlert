@@ -12,7 +12,10 @@ def setup_metadata_dir():
     return metadata_dir
 
 
-def setup_logger(module_name, mode='w', level=logging.DEBUG):
+def setup_logger(pyfile, mode='w'):
+    module_name = pyfile.split('/')[-1]
+    if len(module_name) > 3 and module_name[-3:] == '.py':
+        module_name = module_name[0:-3]
     metadata_dir = setup_metadata_dir()
     log_file = os.path.join(metadata_dir, 'log.{:s}'.format(module_name))
     logging.basicConfig(filename=log_file, filemode=mode)

@@ -142,7 +142,7 @@ class ChromeDriver:
 
 if __name__ == '__main__':
     metadata_dir = setup_metadata_dir()
-    setup_logger(module_name=__file__.split('/')[-1])
+    setup_logger(__file__)
     logger.setLevel(logging.DEBUG)
     # testing
     with ChromeDriver() as browser:
