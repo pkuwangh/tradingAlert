@@ -7,8 +7,8 @@ import sys
 import time
 
 from data_packet import DailyOptionInfo
-from web_chrome_driver import ChromeDriver
 from utils_logging import setup_logger
+from web_chrome_driver import ChromeDriver
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

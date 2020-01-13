@@ -1,18 +1,17 @@
 #!/usr/bin/env python
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-import os
+import logging
 import platform
+import os
+import random
 import sys
 import time
-import random
-import logging
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 from utils_datetime import get_time_log
 from utils_file import openw
 from utils_logging import setup_logger, setup_metadata_dir
-
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

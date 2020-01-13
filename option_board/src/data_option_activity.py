@@ -1,0 +1,175 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import logging
+
+from utils_datetime import get_time_log, get_date_str, get_date
+from utils_file import openw
+from utils_logging import setup_metadata_dir, setup_logger
+from web_chrome_driver import ChromeDriver
+from web_option_activity import read_option_activity
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+
+
+class OptionActivity:
+    __keys = [
+            'symbol',               # basic info
+            'ref_stock_price',
+            'option_type',
+            'strike_price',
+            'exp_date',
+            'day_to_exp',
+            'option_price',
+            'contract_volume',
+            'contract_vol_oi',
+            'deal_time',
+            'total_cost',           # derived
+            'extrinsic_value',
+            'option_volume',        # separate lookup
+            'avg_option_volume',
+            'stock_volume',
+            'avg_stock_volume',
+            'market_cap']
+
+    def __init__(self):
+        self.__inited = False
+        self.__values = {}
+        for k in OptionActivity.__keys:
+            self.__values[k] = None
+
+    def is_inited(self):
+        return self.__inited
+
+    def __lt__(self, other):
+        return self.__values['deal_time'] < other.__values['deal_time']
+
+    def get_basic_display_str(self):
+        return '{:<4s} {:<4s} {:s}->{:s} {:5.1f}->{:5.1f} {:4.1f}%'.format(
+            self.__peek('symbol', is_str=True),
+            self.__peek('option_type', is_str=True),
+            self.__peek('deal_time', is_str=True),
+            self.__peek('exp_date', is_str=True),
+            self.__peek('ref_stock_price'),
+            self.__peek('strike_price'),
+            self.get_otm())
+
+    def get_display_str(self):
+        outstr = self.get_basic_display_str()
+        outstr += ' days={:<2d} vol/oi={:<2.0f} cost={:.1f}M ext={:.1f}M'.format(
+            self.__peek('day_to_exp'),
+            self.__peek('contract_vol_oi'),
+            self.__peek('total_cost')/1e3,
+            self.__peek('extrinsic_value')/1e3)
+        outstr += ' vol(k)={:<4.1f} day_vol={:<4.1f}'.format(
+            self.__peek('contract_volume')/1000,
+            self.__peek('option_volume')/1000)
+        outstr += ' avg_vol={:<4.1f} vol/avg={:<4.1f}'.format(
+            self.__peek('avg_option_volume')/1000,
+            self.__peek('contract_volume')/(self.__peek('avg_option_volume')+0.1))
+        return outstr
+
+    def get_signature(self):
+        if not self.__inited:
+            raise sys.exc_info()[1]
+        return 'Act' + self.__values['deal_time'] + \
+                self.__values['symbol'] + \
+                self.__values['exp_date'] + \
+                self.__values['option_type'] + \
+                str(int(self.__values['strike_price'] * 100))
+
+    def get_otm(self):
+        l_x = 100 * self.get('strike_price') / (self.get('ref_stock_price') + 0.001)
+        if self.is_call():
+            return (l_x - 100)
+        else:
+            return (100 - l_x)
+
+    def get(self, key):
+        if key not in OptionActivity.__keys: raise sys.exc_info()[1]
+        if not self.__inited: raise sys.exc_info()[1]
+        if self.__values[key] is None: raise sys.exc_info()[1]
+        return self.__values[key]
+
+    def __peek(self, key, is_str=False):
+        if key in self.__values and self.__values[key] is not None:
+            return self.__values[key]
+        else:
+            if is_str: return 'Null'
+            else: return 0
+
+    def is_call(self):
+        return ('Call' in self.get('option_type'))
+
+    def is_put(self):
+        return (not self.is_call())
+
+    def __set(self, key, value):
+        if key not in OptionActivity.__keys:
+            raise sys.exc_info()[1]
+        self.__values[key] = value
+
+    def set_option_quote(self, option_volume, avg_option_volume):
+        self.__set('option_volume', option_volume)
+        self.__set('avg_option_volume', avg_option_volume)
+
+    def __derive(self):
+        in_money_call = self.is_call() and \
+            self.get('strike_price') < self.get('ref_stock_price')
+        in_money_put = self.is_put() and \
+            self.get('strike_price') > self.get('ref_stock_price')
+        in_money = in_money_call or in_money_put
+        if in_money:
+            int_price = abs(self.get('strike_price') - self.get('ref_stock_price'))
+            pure_price = self.get('option_price') - int_price
+        else:
+            pure_price = self.get('option_price')
+        # extrinsic value
+        extrinsic_value = int(self.get('contract_volume') * pure_price / 10)
+        self.__set('extrinsic_value', extrinsic_value)
+        # total cost
+        total_cost = int(self.get('contract_volume') * self.get('option_price') / 10)
+        self.__set('total_cost', total_cost)
+
+    def from_activity_str(self, option_activity_str):
+        try:
+            items = option_activity_str.split()
+            self.__set('symbol', items[0])
+            self.__set('ref_stock_price', float(items[1].replace(',', '')))
+            self.__set('option_type', items[2])
+            self.__set('strike_price', float(items[3].replace(',', '').replace('*','')))
+            self.__set('exp_date', get_date_str(get_date(items[4])))
+            self.__set('day_to_exp', int(items[5]))
+            self.__set('option_price', float(items[9].replace(',', '')))
+            self.__set('contract_volume', int(items[10].replace(',', '')))
+            self.__set('contract_vol_oi', float(items[12].replace(',', '')))
+            self.__set('deal_time', get_date_str(get_date(items[14])))
+            self.__inited = True
+            self.__derive()
+        except Exception as e:
+            logger.error('error processing %s: %s' % (option_activity_str.rstrip(), e))
+
+
+if __name__ == '__main__':
+    metadata_dir = setup_metadata_dir()
+    setup_logger(__file__)
+    logger.setLevel(logging.DEBUG)
+    # test from online reading
+    with ChromeDriver() as browser:
+        option_activity_list = read_option_activity(browser, True, metadata_dir)
+        filtered_list = []
+        for line in option_activity_list:
+            option_activity = OptionActivity()
+            option_activity.from_activity_str(line)
+            if option_activity.is_inited():
+                ratio = (option_activity.get('contract_vol_oi') > 5)
+                ext = (option_activity.get('extrinsic_value') > 200)
+                cost = (option_activity.get('total_cost') > 500)
+                if ratio and ext and cost:
+                    filtered_list.append(option_activity.get_display_str())
+        filtered_list.sort()
+        for item in filtered_list:
+            print(item)

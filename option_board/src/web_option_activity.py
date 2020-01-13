@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
 import json
+import logging
 import os
+import random
 import sys
 import time
-import random
-import logging
 
-from web_chrome_driver import ChromeDriver
-from utils_logging import setup_metadata_dir, setup_logger
 from utils_datetime import get_time_log, get_date_str, get_datetime_str
 from utils_file import openw
+from utils_logging import setup_metadata_dir, setup_logger
+from web_chrome_driver import ChromeDriver
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

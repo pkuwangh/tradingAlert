@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import sys
-import sqlite3
 import pandas as pd
+import sqlite3
+import sys
 
 
 def dump_tables(db_filename):
