@@ -16,29 +16,28 @@ logger.setLevel(logging.INFO)
 
 
 class OptionActivity:
-    __keys = [
-            'symbol',               # basic info
-            'ref_stock_price',
-            'option_type',
-            'strike_price',
-            'exp_date',
-            'day_to_exp',
-            'option_price',
-            'contract_volume',
-            'contract_vol_oi',
-            'deal_time',
-            'total_cost',           # derived
-            'extrinsic_value',
-            'option_volume',        # separate lookup
-            'avg_option_volume',
-            'stock_volume',
-            'avg_stock_volume',
-            'market_cap']
+    fields = {
+            'symbol' : 'TEXT',              # basic info
+            'ref_stock_price' : 'REAL',
+            'option_type' : 'TEXT',
+            'strike_price' : 'REAL',
+            'exp_date' : 'INTEGER',
+            'day_to_exp' : 'INTEGER',
+            'option_price' : 'REAL',
+            'contract_vol' : 'INTEGER',
+            'contract_oi' : 'INTEGER',
+            'deal_time' : 'INTEGER',
+            'total_cost' : 'INTEGER',       # derived info
+            'extrinsic_value' : 'INTEGER',
+            'day_option_vol' : 'INTEGER',   # separate lookup
+            'avg_option_vol' : 'INTEGER',
+            'total_oi' : 'INTEGER',
+    }
 
     def __init__(self):
         self.__inited = False
         self.__values = {}
-        for k in OptionActivity.__keys:
+        for k in OptionActivity.fields:
             self.__values[k] = None
 
     def is_inited(self):
@@ -48,11 +47,11 @@ class OptionActivity:
         return self.__values['deal_time'] < other.__values['deal_time']
 
     def get_basic_display_str(self):
-        return '{:<4s} {:<4s} {:s}->{:s} {:5.1f}->{:5.1f} {:4.1f}%'.format(
+        return '{:<4s} {:<4s} {:6d}->{:6d} {:5.1f}->{:<5.1f} {:5.1f}%'.format(
             self.__peek('symbol', is_str=True),
             self.__peek('option_type', is_str=True),
-            self.__peek('deal_time', is_str=True),
-            self.__peek('exp_date', is_str=True),
+            self.__peek('deal_time'),
+            self.__peek('exp_date'),
             self.__peek('ref_stock_price'),
             self.__peek('strike_price'),
             self.get_otm())
@@ -61,25 +60,29 @@ class OptionActivity:
         outstr = self.get_basic_display_str()
         outstr += ' days={:<2d} vol/oi={:<2.0f} cost={:.1f}M ext={:.1f}M'.format(
             self.__peek('day_to_exp'),
-            self.__peek('contract_vol_oi'),
-            self.__peek('total_cost')/1e3,
-            self.__peek('extrinsic_value')/1e3)
+            self.__peek('contract_vol') / (self.__peek('contract_oi')+0.1),
+            self.__peek('total_cost')/1000.0,
+            self.__peek('extrinsic_value')/1000.0)
         outstr += ' vol(k)={:<4.1f} day_vol={:<4.1f}'.format(
-            self.__peek('contract_volume')/1000,
-            self.__peek('option_volume')/1000)
+            self.__peek('contract_vol')/1000.0,
+            self.__peek('day_option_vol')/1000.0)
         outstr += ' avg_vol={:<4.1f} vol/avg={:<4.1f}'.format(
-            self.__peek('avg_option_volume')/1000,
-            self.__peek('contract_volume')/(self.__peek('avg_option_volume')+0.1))
+            self.__peek('avg_option_vol')/1000.0,
+            self.__peek('contract_vol')/(self.__peek('avg_option_vol')+0.1))
+        outstr += ' tot_oi={:<4.1f} vol/tot_oi={:<4.1f}'.format(
+            self.__peek('total_oi')/1000.0,
+            self.__peek('contract_vol')/(self.__peek('total_oi')+0.1))
         return outstr
 
     def get_signature(self):
         if not self.__inited:
             raise sys.exc_info()[1]
-        return 'Act' + self.__values['deal_time'] + \
-                self.__values['symbol'] + \
-                self.__values['exp_date'] + \
-                self.__values['option_type'] + \
-                str(int(self.__values['strike_price'] * 100))
+        return 'Act' + \
+            str(self.__values['deal_time']) + \
+            self.__values['symbol'] + \
+            str(self.__values['exp_date']) + \
+            self.__values['option_type'] + \
+            str(int(self.__values['strike_price'] * 100))
 
     def get_otm(self):
         l_x = 100 * self.get('strike_price') / (self.get('ref_stock_price') + 0.001)
@@ -89,7 +92,7 @@ class OptionActivity:
             return (100 - l_x)
 
     def get(self, key):
-        if key not in OptionActivity.__keys: raise sys.exc_info()[1]
+        if key not in OptionActivity.fields: raise sys.exc_info()[1]
         if not self.__inited: raise sys.exc_info()[1]
         if self.__values[key] is None: raise sys.exc_info()[1]
         return self.__values[key]
@@ -108,13 +111,13 @@ class OptionActivity:
         return (not self.is_call())
 
     def __set(self, key, value):
-        if key not in OptionActivity.__keys:
+        if key not in OptionActivity.fields:
             raise sys.exc_info()[1]
         self.__values[key] = value
 
-    def set_option_quote(self, option_volume, avg_option_volume):
-        self.__set('option_volume', option_volume)
-        self.__set('avg_option_volume', avg_option_volume)
+    def set_option_quote(self, day_option_volume, avg_option_volume):
+        self.__set('day_option_vol', day_option_volume)
+        self.__set('avg_option_vol', avg_option_volume)
 
     def __derive(self):
         in_money_call = self.is_call() and \
@@ -128,10 +131,10 @@ class OptionActivity:
         else:
             pure_price = self.get('option_price')
         # extrinsic value
-        extrinsic_value = int(self.get('contract_volume') * pure_price / 10)
+        extrinsic_value = int(self.get('contract_vol') * pure_price / 10)
         self.__set('extrinsic_value', extrinsic_value)
         # total cost
-        total_cost = int(self.get('contract_volume') * self.get('option_price') / 10)
+        total_cost = int(self.get('contract_vol') * self.get('option_price') / 10)
         self.__set('total_cost', total_cost)
 
     def from_activity_str(self, option_activity_str):
@@ -141,12 +144,12 @@ class OptionActivity:
             self.__set('ref_stock_price', float(items[1].replace(',', '')))
             self.__set('option_type', items[2])
             self.__set('strike_price', float(items[3].replace(',', '').replace('*','')))
-            self.__set('exp_date', get_date_str(get_date(items[4])))
+            self.__set('exp_date', int(get_date_str(get_date(items[4]))))
             self.__set('day_to_exp', int(items[5]))
             self.__set('option_price', float(items[9].replace(',', '')))
-            self.__set('contract_volume', int(items[10].replace(',', '')))
-            self.__set('contract_vol_oi', float(items[12].replace(',', '')))
-            self.__set('deal_time', get_date_str(get_date(items[14])))
+            self.__set('contract_vol', int(items[10].replace(',', '')))
+            self.__set('contract_oi', int(items[11].replace(',', '')))
+            self.__set('deal_time', int(get_date_str(get_date(items[14]))))
             self.__inited = True
             self.__derive()
         except Exception as e:
@@ -165,7 +168,9 @@ if __name__ == '__main__':
             option_activity = OptionActivity()
             option_activity.from_activity_str(line)
             if option_activity.is_inited():
-                ratio = (option_activity.get('contract_vol_oi') > 5)
+                vol = option_activity.get('contract_vol')
+                oi = option_activity.get('contract_oi')
+                ratio = (vol/oi > 5)
                 ext = (option_activity.get('extrinsic_value') > 200)
                 cost = (option_activity.get('total_cost') > 500)
                 if ratio and ext and cost:

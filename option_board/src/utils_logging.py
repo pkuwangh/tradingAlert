@@ -4,8 +4,12 @@ import logging
 import os
 
 
+def get_root_dir():
+    return '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
+
+
 def setup_metadata_dir():
-    root_dir = '/'.join(os.path.abspath(os.path.dirname(__file__)).split('/')[:-1])
+    root_dir = get_root_dir()
     metadata_dir = os.path.join(root_dir, 'logs')
     if not os.path.exists(metadata_dir):
         os.makedirs(metadata_dir)
