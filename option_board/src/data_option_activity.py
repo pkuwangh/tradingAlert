@@ -16,22 +16,23 @@ logger.setLevel(logging.INFO)
 
 
 class OptionActivity:
+    name = 'option_activity'
     fields = {
-            'symbol' : 'TEXT',              # basic info
-            'ref_stock_price' : 'REAL',
-            'option_type' : 'TEXT',
-            'strike_price' : 'REAL',
-            'exp_date' : 'INTEGER',
-            'day_to_exp' : 'INTEGER',
-            'option_price' : 'REAL',
-            'contract_vol' : 'INTEGER',
-            'contract_oi' : 'INTEGER',
-            'deal_time' : 'INTEGER',
-            'total_cost' : 'INTEGER',       # derived info
-            'extrinsic_value' : 'INTEGER',
-            'day_option_vol' : 'INTEGER',   # separate lookup
-            'avg_option_vol' : 'INTEGER',
-            'total_oi' : 'INTEGER',
+        'symbol': 'TEXT',              # basic info
+        'ref_stock_price': 'REAL',
+        'option_type': 'TEXT',
+        'strike_price': 'REAL',
+        'exp_date': 'INTEGER',
+        'day_to_exp': 'INTEGER',
+        'option_price': 'REAL',
+        'contract_vol': 'INTEGER',
+        'contract_oi': 'INTEGER',
+        'deal_time': 'INTEGER',
+        'total_cost': 'INTEGER',       # derived info
+        'extrinsic_value': 'INTEGER',
+        'day_option_vol': 'INTEGER',   # separate lookup
+        'avg_option_vol': 'INTEGER',
+        'total_oi': 'INTEGER',
     }
 
     def __init__(self):

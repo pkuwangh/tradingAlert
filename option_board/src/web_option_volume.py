@@ -8,6 +8,7 @@ import time
 
 from data_packet import DailyOptionInfo
 from utils_logging import setup_logger
+from utils_datetime import get_date_str
 from web_chrome_driver import ChromeDriver
 
 logger = logging.getLogger(__name__)
@@ -37,20 +38,20 @@ def parse_daily_option_info(option_info, web_data):
             if line.startswith('Put ') or line.startswith('Call '):
                 num = int(web_data[idx + 1].replace(',', ''))
                 if line.startswith('Call Volume'):
-                    option_info.call_vol += num
+                    option_info.inc('call_vol', num)
                 elif line.startswith('Put Volume'):
-                    option_info.put_vol += num
+                    option_info.inc('put_vol', num)
                 elif line.startswith('Call Open'):
-                    option_info.call_oi += num
+                    option_info.inc('call_oi', num)
                 elif line.startswith('Put Open'):
-                    option_info.put_oi += num
+                    option_info.inc('put_oi', num)
     except Exception as e:
         raise e
 
 
 def read_daily_option_info(browser, symbol, use_barchart=True):
     retry_timeout = 4
-    option_info = DailyOptionInfo()
+    option_info = DailyOptionInfo(symbol, int(get_date_str()))
     if use_barchart:
         all_exp_dates = read_exp_dates(browser, symbol)
         eclass = 'bc-futures-options-quotes-totals'
