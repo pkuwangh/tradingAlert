@@ -61,6 +61,16 @@ class DBMS:
             logger.info(f'{get_time_log()} SQL: {sql_str}')
             cursor.execute(sql_str, values)
 
+    def read_table(self, table_name, keys):
+        with self.conn:
+            cursor = self.conn.cursor()
+            sql_str = 'SELECT {} FROM {}'.format(
+                sql_cols(keys), table_name
+            )
+            logger.info(f'{get_time_log()} SQL: {sql_str}')
+            cursor.execute(sql_str)
+            return cursor.fetchall()
+
 
 if __name__ == '__main__':
     root_dir = get_root_dir()
@@ -72,3 +82,5 @@ if __name__ == '__main__':
         with ChromeDriver() as browser:
             option_info = read_daily_option_info(browser, 'ASHR')
             db.write_table(DailyOptionInfo.name, option_info)
+        x = db.read_table(DailyOptionInfo.name, DailyOptionInfo.fields.keys())
+        print(x)
