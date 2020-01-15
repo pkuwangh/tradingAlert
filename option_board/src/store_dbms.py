@@ -34,6 +34,9 @@ class DBMS:
         except:
             logger.warning('error closing sqlite3 connection')
 
+    def get_conn(self):
+        return self.conn
+
     def create_tables(self):
         with self.conn:
             cursor = self.conn.cursor()
