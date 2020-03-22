@@ -2,6 +2,7 @@
 
 import logging
 import os
+import pandas
 import sqlite3
 import sys
 
@@ -15,6 +16,18 @@ from web_option_volume import read_daily_option_info
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+
+def execute_sql(cursor, sql_str, values=None):
+    logger.info(f'{get_time_log()} SQL: {sql_str}')
+    if values:
+        cursor.execute(sql_str, values)
+    else:
+        cursor.execute(sql_str)
+    if sql_str.lstrip().startswith("SELECT"):
+        return cursor.fetchall()
+    else:
+        return None
 
 
 class DBMS:
@@ -49,30 +62,30 @@ class DBMS:
                 base_sql, DailyOptionInfo.name, sql_schema(DailyOptionInfo.fields)
             ))
             for sql_str in sqls:
-                logger.info(f'{get_time_log()} SQL: {sql_str}')
-                cursor.execute(sql_str)
+                execute_sql(cursor, sql_str)
 
-    def write_table(self, table_name, data_pkt):
+    def write_row(self, table_name, data_pkt):
         with self.conn:
             cursor = self.conn.cursor()
             sql_str = 'INSERT INTO {}({}) VALUES({})'.format(
                 table_name,
                 sql_cols(data_pkt.fields.keys()),
-                sql_slots(data_pkt.fields.keys())
+                sql_slots(data_pkt.fields.keys()),
             )
             values = sql_values(data_pkt)
-            logger.info(f'{get_time_log()} SQL: {sql_str}')
-            cursor.execute(sql_str, values)
+            execute_sql(cursor, sql_str, values)
 
-    def read_table(self, table_name, keys):
+    def read_table(self, table_name, keys) -> pandas.DataFrame:
         with self.conn:
             cursor = self.conn.cursor()
             sql_str = 'SELECT {} FROM {}'.format(
-                sql_cols(keys), table_name
+                sql_cols(keys), table_name,
             )
-            logger.info(f'{get_time_log()} SQL: {sql_str}')
-            cursor.execute(sql_str)
-            return cursor.fetchall()
+            raw_data = execute_sql(cursor, sql_str)
+            return pandas.DataFrame(
+                raw_data,
+                columns=keys,
+            )
 
 
 if __name__ == '__main__':
@@ -84,6 +97,6 @@ if __name__ == '__main__':
     with DBMS(db_file) as db:
         with ChromeDriver() as browser:
             option_info = read_daily_option_info(browser, 'ASHR')
-            db.write_table(DailyOptionInfo.name, option_info)
+            db.write_row(DailyOptionInfo.name, option_info)
         x = db.read_table(DailyOptionInfo.name, DailyOptionInfo.fields.keys())
         print(x)

@@ -116,9 +116,10 @@ class OptionActivity:
             raise sys.exc_info()[1]
         self.__values[key] = value
 
-    def set_option_quote(self, day_option_volume, avg_option_volume):
+    def set_option_info(self, day_option_volume, avg_option_volume, total_oi):
         self.__set('day_option_vol', day_option_volume)
         self.__set('avg_option_vol', avg_option_volume)
+        self.__set('total_oi', total_oi)
 
     def __derive(self):
         in_money_call = self.is_call() and \

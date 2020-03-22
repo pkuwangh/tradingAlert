@@ -71,7 +71,7 @@ def read_option_activity(browser, save_file=False, folder='logs'):
                 time.sleep(num_retry)
                 continue
     if num_retry >= retry_timeout:
-        raise sys.exc_info()[1]
+        return []
     # save a copy
     if save_file:
         # try to remove duplicates
