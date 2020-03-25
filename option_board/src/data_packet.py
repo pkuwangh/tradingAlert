@@ -1,6 +1,20 @@
 #!/usr/bin/env python
 
 
+class LiveSymbol:
+    name = 'live_symbol'
+    fields = {
+        'symbol': 'TEXT PRIMARY KEY',
+    }
+
+    def __init__(self, symbol):
+        self.__values = {}
+        self.__values['symbol'] = symbol
+
+    def get(self, key):
+        return self.__values[key]
+
+
 class DailyOptionInfo:
     name = 'daily_option_info'
     fields = {

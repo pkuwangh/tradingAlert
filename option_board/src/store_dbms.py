@@ -7,7 +7,7 @@ import sqlite3
 import sys
 
 from data_option_activity import OptionActivity
-from data_packet import DailyOptionInfo
+from data_packet import LiveSymbol, DailyOptionInfo
 from utils_datetime import get_time_log
 from utils_logging import get_root_dir, setup_logger, setup_metadata_dir
 from utils_sql import sql_schema, sql_cols, sql_slots, sql_values
@@ -61,13 +61,17 @@ class DBMS:
             sqls.append('{} {} ({})'.format(
                 base_sql, DailyOptionInfo.name, sql_schema(DailyOptionInfo.fields)
             ))
+            sqls.append('{} {} ({})'.format(
+                base_sql, LiveSymbol.name, sql_schema(LiveSymbol.fields)
+            ))
             for sql_str in sqls:
                 execute_sql(cursor, sql_str)
 
-    def write_row(self, table_name, data_pkt):
+    def write_row(self, table_name, data_pkt, insert_unique=False):
         with self.conn:
             cursor = self.conn.cursor()
-            sql_str = 'INSERT INTO {}({}) VALUES({})'.format(
+            sql_str = 'INSERT {} INTO {}({}) VALUES({})'.format(
+                'OR IGNORE' if insert_unique else '',
                 table_name,
                 sql_cols(data_pkt.fields.keys()),
                 sql_slots(data_pkt.fields.keys()),

@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def parse_option_activity(web_data):
+def parse_option_activity(web_data) -> list:
     option_activity_list = []
     main_table_started = False
     new_activity = ''
@@ -42,7 +42,9 @@ def parse_option_activity(web_data):
     return option_activity_list
 
 
-def read_option_activity(browser, save_file=False, folder='logs'):
+def read_option_activity(
+    browser: ChromeDriver, save_file=False, folder='logs'
+) -> list:
     retry_timeout = 4
     url = 'https://www.barchart.com/options/unusual-activity/stocks?page=all'
     eid = 'main-content-column'
@@ -74,11 +76,15 @@ def read_option_activity(browser, save_file=False, folder='logs'):
         return []
     # save a copy
     if save_file:
-        # try to remove duplicates
-        today_str = get_date_str()
-        for item in os.listdir(folder):
-            if item.startswith('OA_%s' % (today_str)):
-                os.remove(os.path.join(folder, item))
+        # try to remove duplicates if folder exists
+        if os.path.exists(folder):
+            today_str = get_date_str()
+            for item in os.listdir(folder):
+                if item.startswith('OA_%s' % (today_str)):
+                    os.remove(os.path.join(folder, item))
+        else:
+            # otherwise create folder
+            os.makedirs(folder)
         # write new one
         filename = os.path.join(folder, f'OA_{get_datetime_str()}.txt.gz')
         with openw(filename, 'wt') as fout:
