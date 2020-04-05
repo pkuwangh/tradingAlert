@@ -7,7 +7,7 @@ import sys
 from collections import namedtuple
 
 from data_option_activity import OptionActivity
-from data_packet import LiveSymbol, DailyOptionInfo
+from data_packet import LiveSymbol, DailyOptionInfo, AvgOptionInfo
 from store_dbms import DBMS, execute_sql
 from utils_datetime import get_time_log
 from utils_logging import get_root_dir, setup_logger, setup_metadata_dir
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def get_db_file() -> str:
+def get_db_file()-> str:
     return os.path.join(get_root_dir(), 'database.sqlite3')
 
 
@@ -33,21 +33,19 @@ def write_daily_option_volume(db: DBMS, option_info: DailyOptionInfo):
     db.write_row(DailyOptionInfo.name, option_info)
 
 
-def read_avg_option_info(db: DBMS, symbol: str) -> namedtuple:
+def read_avg_option_info(db: DBMS, symbol: str)-> AvgOptionInfo:
     with db.get_conn() as conn:
         cursor = conn.cursor()
-        fields = 'AVG(call_vol), AVG(put_vol), AVG(call_oi), AVG(put_oi), COUNT(1)'
+        fields = [
+            f"{AvgOptionInfo.fields[x]}" for x in AvgOptionInfo.fields.keys()
+        ]
         sql_str = "SELECT {} FROM {} WHERE {}='{}'".format(
-            fields,
+            ", ".join(fields),
             DailyOptionInfo.name,
             'symbol', symbol,
         )
         raw_data = execute_sql(cursor, sql_str)[0]
-        AVG_OPTION_INFO = namedtuple(
-            'AVG_OPTION_INFO',
-            ['avg_call_vol', 'avg_put_vol', 'avg_call_oi', 'avg_put_oi', 'count']
-        )
-        return AVG_OPTION_INFO(*raw_data)
+        return AvgOptionInfo(raw_data)
 
 
 def cleanup_daily_option_info(db: DBMS, symbol: str=''):
@@ -91,6 +89,7 @@ if __name__ == '__main__':
     metadata_dir = setup_metadata_dir()
     setup_logger(__file__)
     logger.setLevel(logging.DEBUG)
+    logging.getLogger('store_dbms').setLevel(logging.DEBUG)
     db_file = os.path.join(root_dir, 'database.sqlite3')
     with DBMS(db_file) as db:
         print(read_avg_option_info(db, 'ASHR'))

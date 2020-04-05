@@ -49,7 +49,9 @@ def parse_daily_option_info(option_info, web_data):
         raise e
 
 
-def read_daily_option_info(browser, symbol, use_barchart=True):
+def read_daily_option_info(
+    browser: ChromeDriver, symbol: str, use_barchart: bool=True
+)-> DailyOptionInfo:
     retry_timeout = 4
     option_info = DailyOptionInfo(symbol, int(get_date_str()))
     if use_barchart:

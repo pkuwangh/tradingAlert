@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def parse_option_activity(web_data) -> list:
+def parse_option_activity(web_data)-> list:
     option_activity_list = []
     main_table_started = False
     new_activity = ''
@@ -44,7 +44,7 @@ def parse_option_activity(web_data) -> list:
 
 def read_option_activity(
     browser: ChromeDriver, save_file=False, folder='logs'
-) -> list:
+)-> list:
     retry_timeout = 4
     url = 'https://www.barchart.com/options/unusual-activity/stocks?page=all'
     eid = 'main-content-column'

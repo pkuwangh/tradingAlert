@@ -4,6 +4,7 @@ import os
 import sys
 import logging
 
+from data_packet import BaseDataPacket
 from utils_datetime import get_time_log, get_date_str, get_date
 from utils_file import openw
 from utils_logging import setup_metadata_dir, setup_logger
@@ -14,8 +15,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-
-class OptionActivity:
+class OptionActivity(BaseDataPacket):
     name = 'option_activity'
     fields = {
         'symbol': 'TEXT',              # basic info
@@ -36,16 +36,16 @@ class OptionActivity:
     }
 
     def __init__(self):
+        super(OptionActivity, self).__init__()
         self.__inited = False
-        self.__values = {}
         for k in OptionActivity.fields:
-            self.__values[k] = None
+            self._values[k] = None
 
     def is_inited(self):
         return self.__inited
 
     def __lt__(self, other):
-        return self.__values['deal_time'] < other.__values['deal_time']
+        return self._values['deal_time'] < other._values['deal_time']
 
     def get_basic_display_str(self):
         return '{:<4s} {:<4s} {:6d}->{:6d} {:5.1f}->{:<5.1f} {:5.1f}%'.format(
@@ -79,11 +79,11 @@ class OptionActivity:
         if not self.__inited:
             raise sys.exc_info()[1]
         return 'Act' + \
-            str(self.__values['deal_time']) + \
-            self.__values['symbol'] + \
-            str(self.__values['exp_date']) + \
-            self.__values['option_type'] + \
-            str(int(self.__values['strike_price'] * 100))
+            str(self._values['deal_time']) + \
+            self._values['symbol'] + \
+            str(self._values['exp_date']) + \
+            self._values['option_type'] + \
+            str(int(self._values['strike_price'] * 100))
 
     def get_otm(self):
         l_x = 100 * self.get('strike_price') / (self.get('ref_stock_price') + 0.001)
@@ -95,12 +95,12 @@ class OptionActivity:
     def get(self, key):
         if key not in OptionActivity.fields: raise sys.exc_info()[1]
         if not self.__inited: raise sys.exc_info()[1]
-        if self.__values[key] is None: raise sys.exc_info()[1]
-        return self.__values[key]
+        if self._values[key] is None: raise sys.exc_info()[1]
+        return self._values[key]
 
     def __peek(self, key, is_str=False):
-        if key in self.__values and self.__values[key] is not None:
-            return self.__values[key]
+        if key in self._values and self._values[key] is not None:
+            return self._values[key]
         else:
             if is_str: return 'Null'
             else: return 0
@@ -111,10 +111,13 @@ class OptionActivity:
     def is_put(self):
         return (not self.is_call())
 
+    def set(self, key, value):
+        raise sys.exc_info()[1]
+
     def __set(self, key, value):
         if key not in OptionActivity.fields:
             raise sys.exc_info()[1]
-        self.__values[key] = value
+        self._values[key] = value
 
     def set_option_info(self, day_option_volume, avg_option_volume, total_oi):
         self.__set('day_option_vol', day_option_volume)

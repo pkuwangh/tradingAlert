@@ -1,44 +1,71 @@
 #!/usr/bin/env python
 
 
-class LiveSymbol:
-    name = 'live_symbol'
+class BaseDataPacket:
+    def __init__(self):
+        self._values = {}
+
+    def __str__(self):
+        return "({})".format(
+            ", ".join([f"{k}: {v}" for k, v in self._values.items()])
+        )
+
+    def get(self, key):
+        return self._values[key]
+
+    def set(self, key, value):
+        self._values[key] = value
+
+    def inc(self, key, value):
+        self._values[key] += value
+
+
+class LiveSymbol(BaseDataPacket):
+    name = "live_symbol"
     fields = {
-        'symbol': 'TEXT PRIMARY KEY',
+        "symbol": "TEXT PRIMARY KEY",
     }
 
     def __init__(self, symbol):
-        self.__values = {}
-        self.__values['symbol'] = symbol
-
-    def get(self, key):
-        return self.__values[key]
+        BaseDataPacket.__init__(self)
+        self._values["symbol"] = symbol
 
 
-class DailyOptionInfo:
-    name = 'daily_option_info'
+class DailyOptionInfo(BaseDataPacket):
+    name = "daily_option_info"
     fields = {
-        'symbol': 'TEXT',
-        'date': 'INTEGER',
-        'call_vol': 'INTEGER',
-        'call_oi': 'INTEGER',
-        'put_vol': 'INTEGER',
-        'put_oi': 'INTEGER',
+        "symbol": "TEXT",
+        "date": "INTEGER",
+        "call_vol": "INTEGER",
+        "call_oi": "INTEGER",
+        "put_vol": "INTEGER",
+        "put_oi": "INTEGER",
     }
 
     def __init__(self, symbol=None, date=None):
-        self.__values = {}
-        self.__values['symbol'] = symbol
-        self.__values['date'] = date
+        BaseDataPacket.__init__(self)
+        self._values["symbol"] = symbol
+        self._values["date"] = date
         for k in DailyOptionInfo.fields:
-            if k not in self.__values.keys():
-                self.__values[k] = 0
+            if k not in self._values.keys():
+                self._values[k] = 0
 
-    def set(self, key, value):
-        self.__values[key] = value
 
-    def inc(self, key, value):
-        self.__values[key] += value
+class AvgOptionInfo(BaseDataPacket):
+    name = "AvgOptionInfo"
+    fields = {
+        "avg_call_vol": "AVG(call_vol)",
+        "avg_put_vol": "AVG(put_vol)",
+        "avg_call_oi": "AVG(call_oi)",
+        "avg_put_oi": "AVG(put_oi)",
+        "count": "COUNT(1)",
+    }
 
-    def get(self, key):
-        return self.__values[key]
+    def __init__(self, values):
+        BaseDataPacket.__init__(self)
+        for idx, key in enumerate(AvgOptionInfo.fields.keys()):
+            v = values[idx]
+            self.set(
+                key,
+                int(v) if type(v) is float else v,
+            )

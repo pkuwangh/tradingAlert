@@ -19,7 +19,7 @@ logger.setLevel(logging.INFO)
 
 
 def execute_sql(cursor, sql_str, values=None):
-    logger.info(f'{get_time_log()} SQL: {sql_str}')
+    logger.debug(f'{get_time_log()} SQL: {sql_str}')
     if values:
         cursor.execute(sql_str, values)
     else:
@@ -79,7 +79,7 @@ class DBMS:
             values = sql_values(data_pkt)
             execute_sql(cursor, sql_str, values)
 
-    def read_table(self, table_name, keys) -> pandas.DataFrame:
+    def read_table(self, table_name, keys)-> pandas.DataFrame:
         with self.conn:
             cursor = self.conn.cursor()
             sql_str = 'SELECT {} FROM {}'.format(
