@@ -63,13 +63,20 @@ class ChromeDriver:
             self.driver.close()
             self.driver.quit()
 
-    def download_data(self, url, \
-            wait_base=1,
-            button_css=None, \
-            pre_element_id=None, pre_element_class=None, \
-            element_id=None, element_class=None, \
-            outfile=None):
-        logger.info(f"{get_time_log()} download data from {url}")
+    def download_data(
+        self,
+        url,
+        wait_base=1,
+        button_css=None,
+        pre_element_id=None,
+        pre_element_class=None,
+        element_id=None,
+        element_class=None,
+        outfile=None,
+        suppress_log=False,
+    ):
+        if not suppress_log:
+            logger.info(f"{get_time_log()} download data from {url}")
         num_retry = 0
         retry_timeout = 4
         element = None

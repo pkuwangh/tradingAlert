@@ -30,9 +30,8 @@ class OptionActivity(BaseDataPacket):
         'deal_time': 'INTEGER',
         'total_cost': 'INTEGER',       # derived info
         'extrinsic_value': 'INTEGER',
-        'day_option_vol': 'INTEGER',   # separate lookup
-        'avg_option_vol': 'INTEGER',
-        'total_oi': 'INTEGER',
+        'avg_option_vol': 'INTEGER',   # separate lookup
+        'avg_total_oi': 'INTEGER',
     }
 
     def __init__(self):
@@ -61,19 +60,27 @@ class OptionActivity(BaseDataPacket):
         outstr = self.get_basic_display_str()
         outstr += ' days={:<2d} vol/oi={:<2.0f} cost={:.1f}M ext={:.1f}M'.format(
             self.__peek('day_to_exp'),
-            self.__peek('contract_vol') / (self.__peek('contract_oi')+0.1),
+            self.get_contract_vol_oi(),
             self.__peek('total_cost')/1000.0,
             self.__peek('extrinsic_value')/1000.0)
-        outstr += ' vol(k)={:<4.1f} day_vol={:<4.1f}'.format(
-            self.__peek('contract_vol')/1000.0,
-            self.__peek('day_option_vol')/1000.0)
+        outstr += ' vol(k)={:<4.1f}'.format(
+            self.__peek('contract_vol')/1000.0)
         outstr += ' avg_vol={:<4.1f} vol/avg={:<4.1f}'.format(
             self.__peek('avg_option_vol')/1000.0,
-            self.__peek('contract_vol')/(self.__peek('avg_option_vol')+0.1))
-        outstr += ' tot_oi={:<4.1f} vol/tot_oi={:<4.1f}'.format(
-            self.__peek('total_oi')/1000.0,
-            self.__peek('contract_vol')/(self.__peek('total_oi')+0.1))
+            self.get_contract_vol_avg_vol())
+        outstr += ' tot_oi={:<4.1f} vol/tot_oi={:<4.1f}%'.format(
+            self.__peek('avg_total_oi')/1000.0,
+            self.get_contract_vol_avg_tot_oi()*100)
         return outstr
+
+    def get_contract_vol_oi(self):
+        return self.__peek('contract_vol') / (self.__peek('contract_oi')+0.1)
+
+    def get_contract_vol_avg_vol(self):
+        return self.__peek('contract_vol') / (self.__peek('avg_option_vol') + 0.1)
+
+    def get_contract_vol_avg_tot_oi(self):
+        return self.__peek('contract_vol') / (self.__peek('avg_total_oi') + 0.1)
 
     def get_signature(self):
         if not self.__inited:
@@ -119,10 +126,9 @@ class OptionActivity(BaseDataPacket):
             raise sys.exc_info()[1]
         self._values[key] = value
 
-    def set_option_info(self, day_option_volume, avg_option_volume, total_oi):
-        self.__set('day_option_vol', day_option_volume)
+    def set_option_info(self, avg_option_volume, avg_total_oi):
         self.__set('avg_option_vol', avg_option_volume)
-        self.__set('total_oi', total_oi)
+        self.__set('avg_total_oi', avg_total_oi)
 
     def __derive(self):
         in_money_call = self.is_call() and \

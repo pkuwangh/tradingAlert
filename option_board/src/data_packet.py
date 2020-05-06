@@ -69,3 +69,9 @@ class AvgOptionInfo(BaseDataPacket):
                 key,
                 int(v) if type(v) is float else v,
             )
+
+    def get_avg_vol(self):
+        return self.get("avg_call_vol") + self.get("avg_put_vol")
+
+    def get_avg_oi(self):
+        return self.get("avg_call_oi") + self.get("avg_put_oi")

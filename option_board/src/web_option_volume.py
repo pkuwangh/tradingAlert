@@ -67,8 +67,12 @@ def read_daily_option_info(
                 num_retry += 1
                 try:
                     web_data = browser.download_data(
-                            url=url, wait_base=2 * num_retry,
-                            pre_element_class=pre_eclass, element_class=eclass)
+                        url=url,
+                        wait_base=2 * num_retry,
+                        pre_element_class=pre_eclass,
+                        element_class=eclass,
+                        suppress_log=True,
+                    )
                     parse_daily_option_info(option_info, web_data.splitlines())
                 except Exception as e:
                     logger.error('error {:s} (retry={:d}/{:d})'.format(
