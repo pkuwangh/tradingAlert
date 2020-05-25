@@ -3,8 +3,6 @@
 import logging
 import multiprocessing as mp
 import os
-import sys
-import time
 import typing
 
 from data_option_activity import OptionActivity
@@ -13,7 +11,8 @@ from store_dbms import DBMS
 from store_proxy import (
     get_db_file,
     add_to_symbol_table,
-    write_daily_option_volume, write_option_activity, read_avg_option_info,
+    write_option_activity,
+    read_avg_option_info,
 )
 from utils_datetime import get_time_log
 from utils_file import openw
@@ -181,8 +180,8 @@ def process_option_activity(
 def hunt(
     option_activity_file: str = None
 ) -> typing.Mapping[str, DailyOptionInfo]:
-    logger.info('================================================')
-    logger.info(f'{get_time_log()} Hunt or to be hunted !!!')
+    logger.info("================================================")
+    logger.info(f"{get_time_log()} Hunt or to be hunted !!!")
     # synchronized queues
     raw_oa_queues = [mp.Queue(maxsize=1000) for _ in range(mp.cpu_count())]
     filtered_oa_queue = mp.Queue(maxsize=1000)
@@ -193,7 +192,7 @@ def hunt(
         with ChromeDriver() as browser:
             option_activity_list = read_option_activity(
                 browser,
-                save_file=False, folder='records/raw_option_activity',
+                save_file=False, folder="records/raw_option_activity",
             )
     else:
         with openw(option_activity_file, "rt") as fp:

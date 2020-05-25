@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import argparse
 import pandas as pd
 import sqlite3
 import sys
@@ -22,7 +23,12 @@ def dump_tables(db_filename):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print('usage: {} <sqlite3 DB filename>'.format(sys.argv[0]))
-        sys.exit(1)
-    dump_tables(sys.argv[1])
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        description="DB reader",
+    )
+    parser.add_argument("-f", "--dbfile", required=True,
+                        help="sqlite3 DB filename")
+
+    args = parser.parse_args()
+    dump_tables(args.dbfile)

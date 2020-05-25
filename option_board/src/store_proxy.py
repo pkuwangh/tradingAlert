@@ -5,11 +5,12 @@ import os
 import sqlite3
 import sys
 from collections import namedtuple
+from typing import List
 
 from data_option_activity import OptionActivity
 from data_packet import LiveSymbol, DailyOptionInfo, AvgOptionInfo
 from store_dbms import DBMS, execute_sql
-from utils_datetime import get_time_log
+from utils_datetime import get_time_log, get_date_str
 from utils_logging import get_root_dir, setup_logger, setup_metadata_dir
 from utils_sql import sql_cols
 
@@ -46,6 +47,20 @@ def read_avg_option_info(db: DBMS, symbol: str)-> AvgOptionInfo:
         )
         raw_data = execute_sql(cursor, sql_str)[0]
         return AvgOptionInfo(raw_data)
+
+
+def read_option_activity(db: DBMS, exp_date: int)-> List[OptionActivity]:
+    with db.get_conn() as conn:
+        cursor = conn.cursor()
+        fields = list(OptionActivity.fields.keys())
+        where_term = f"exp_date >= {exp_date}"
+        sql_str = "SELECT {} FROM {} WHERE {}".format(
+            ", ".join(fields),
+            OptionActivity.name,
+            where_term,
+        )
+        raw_data = execute_sql(cursor, sql_str)
+        return [OptionActivity(x) for x in raw_data]
 
 
 def cleanup_daily_option_info(db: DBMS, symbol: str=''):
@@ -97,3 +112,8 @@ if __name__ == '__main__':
         cleanup_daily_option_info(db)
         x = db.read_table(DailyOptionInfo.name, DailyOptionInfo.fields.keys())
         print(x)
+        for x in read_option_activity(db, get_date_str()):
+            print(x.get_display_str())
+        x = db.read_table(LiveSymbol.name, LiveSymbol.fields.keys())
+        print(x)
+        print(list(x["symbol"])[0:4])

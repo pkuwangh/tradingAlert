@@ -34,11 +34,17 @@ class OptionActivity(BaseDataPacket):
         'avg_total_oi': 'INTEGER',
     }
 
-    def __init__(self):
+    def __init__(self, values=None):
         super(OptionActivity, self).__init__()
         self.__inited = False
         for k in OptionActivity.fields:
             self._values[k] = None
+        if values:
+            self.__inited = True
+            for idx, key in enumerate(OptionActivity.fields.keys()):
+                v = values[idx]
+                self.__set(key, v)
+
 
     def is_inited(self):
         return self.__inited

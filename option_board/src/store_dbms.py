@@ -64,6 +64,9 @@ class DBMS:
             sqls.append('{} {} ({})'.format(
                 base_sql, LiveSymbol.name, sql_schema(LiveSymbol.fields)
             ))
+            sqls.append('{} {} ({})'.format(
+                base_sql, DailyOptionInfo.name, sql_schema(DailyOptionInfo.fields)
+            ))
             for sql_str in sqls:
                 execute_sql(cursor, sql_str)
 
