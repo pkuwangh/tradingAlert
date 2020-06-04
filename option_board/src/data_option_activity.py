@@ -90,7 +90,7 @@ class OptionActivity(BaseDataPacket):
 
     def get_signature(self):
         if not self.__inited:
-            raise sys.exc_info()[1]
+            raise RuntimeError("OA object not initialized")
         return 'Act' + \
             str(self._values['deal_time']) + \
             self._values['symbol'] + \
@@ -106,9 +106,9 @@ class OptionActivity(BaseDataPacket):
             return (100 - l_x)
 
     def get(self, key):
-        if key not in OptionActivity.fields: raise sys.exc_info()[1]
-        if not self.__inited: raise sys.exc_info()[1]
-        if self._values[key] is None: raise sys.exc_info()[1]
+        if key not in OptionActivity.fields: raise KeyError(f"Invalid key={key}")
+        if not self.__inited: raise RuntimeError("OA object not initialized")
+        if self._values[key] is None: raise ValueError(f"Invalid field key={key}")
         return self._values[key]
 
     def __peek(self, key, is_str=False):
@@ -125,11 +125,11 @@ class OptionActivity(BaseDataPacket):
         return (not self.is_call())
 
     def set(self, key, value):
-        raise sys.exc_info()[1]
+        raise RuntimeError("Should not be used")
 
     def __set(self, key, value):
         if key not in OptionActivity.fields:
-            raise sys.exc_info()[1]
+            raise KeyError(f"Invalid key={key}")
         self._values[key] = value
 
     def set_option_info(self, avg_option_volume, avg_total_oi):

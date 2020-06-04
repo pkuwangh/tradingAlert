@@ -162,7 +162,7 @@ class ChromeDriver:
             return element.text
         else:
             logger.error(f"{get_time_log()} failed to get element from {url}")
-            raise sys.exc_info()[1]
+            raise RuntimeError("chrome driver failed to read data")
 
 
 if __name__ == "__main__":

@@ -60,7 +60,10 @@ def filter(
     # use daily option info if no history found
     if avg_option_info.get("count") == 0:
         if symbol not in cache:
-            cache[symbol] = read_daily_option_info(browser, symbol)
+            cache[symbol] = read_daily_option_info(
+                browser, symbol,
+                suppress_all_log=True, suppress_sub_log=True,
+            )
         daily_option_info = cache[symbol]
         avg_option_info.set("avg_call_oi", daily_option_info.get("call_oi"))
         avg_option_info.set("avg_put_oi", daily_option_info.get("put_oi"))
@@ -100,8 +103,8 @@ def filter_detail(
         high_volume_spike = (ratio > 8)
     else:
         ratio = new_option_activity.get_contract_vol_avg_tot_oi()
-        mid_volume_spike = (ratio > 0.20)
-        high_volume_spike = (ratio > 0.40)
+        mid_volume_spike = (ratio > 0.40)
+        high_volume_spike = (ratio > 0.80)
     # reference price
     ntm = (new_option_activity.get_otm() < 8)
     atm = (new_option_activity.get_otm() < 3)
@@ -178,7 +181,8 @@ def process_option_activity(
 
 
 def hunt(
-    option_activity_file: str = None
+    max_oa: int=0,
+    option_activity_file: str=None,
 ) -> typing.Mapping[str, DailyOptionInfo]:
     logger.info("================================================")
     logger.info(f"{get_time_log()} Hunt or to be hunted !!!")
@@ -197,6 +201,8 @@ def hunt(
     else:
         with openw(option_activity_file, "rt") as fp:
             option_activity_list = fp.readlines()
+    if max_oa > 0 and max_oa < len(option_activity_list):
+        option_activity_list = option_activity_list[0 : max_oa]
     # launch down-stream workers
     worker_procs = [mp.Process(
         target=evaluate_option_activity,
@@ -234,5 +240,5 @@ if __name__ == '__main__':
     logger.setLevel(logging.DEBUG)
     #logging.getLogger('store_dbms').setLevel(logging.DEBUG)
     #hunt(os.path.join(metadata_dir, "OA_200405_012638.txt.gz"))
-    cache = hunt()
+    cache = hunt(max_oa=4)
     print(len(cache))

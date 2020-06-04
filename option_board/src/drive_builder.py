@@ -37,7 +37,10 @@ def read_info(
                 symbol_queue.put(None, block=True)
                 break
             num_items += 1
-            daily_option_info = read_daily_option_info(browser, symbol)
+            daily_option_info = read_daily_option_info(
+                browser, symbol,
+                suppress_all_log=True, suppress_sub_log=True,
+            )
             info_queue.put(daily_option_info)
     info_queue.put(None)
     logger.info(f"History builder worker-{pname} processed {num_items} items")
@@ -65,7 +68,7 @@ def persist_info(
     _ = [write_daily_option_volume(db, info) for info in info_list]
 
 
-def build_history()-> None:
+def build_history(max_symbols: int=0)-> None:
     logger.info("================================================")
     logger.info(f"{get_time_log()} Let's build history !!!")
     # synchronized queues
@@ -90,7 +93,8 @@ def build_history()-> None:
         writer_proc.start()
         # enqueue candidate
         live_symbols = db.read_table(LiveSymbol.name, LiveSymbol.fields.keys())
-        for x in list(live_symbols["symbol"])[0:10]:
+        num_symbols = max_symbols if max_symbols > 0 else len(live_symbols)
+        for x in list(live_symbols["symbol"])[0:num_symbols]:
             if is_in_black_list(x):
                 continue
             symbol_queue.put(x, block=True)
@@ -105,4 +109,4 @@ if __name__ == '__main__':
     setup_logger(__file__)
     logger.setLevel(logging.DEBUG)
     logging.getLogger('store_dbms').setLevel(logging.DEBUG)
-    build_history()
+    build_history(max_symbols=4)
