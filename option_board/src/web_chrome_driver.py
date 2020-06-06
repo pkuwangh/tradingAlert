@@ -74,7 +74,7 @@ class ChromeDriver:
         element_class=None,
         outfile=None,
         suppress_log=False,
-    ):
+    )-> str:
         if not suppress_log:
             logger.info(f"{get_time_log()} download data from {url}")
         num_retry = 0

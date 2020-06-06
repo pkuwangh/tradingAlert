@@ -31,6 +31,55 @@ class LiveSymbol(BaseDataPacket):
         self._values["symbol"] = symbol
 
 
+class DailyStockQuote(BaseDataPacket):
+    name = "daily_stock_quote"
+    fields = {
+        "symbol": "TEXT",
+        "date": "INTEGER",
+        "market_cap": "INTEGER",
+        "price_high": "REAL",
+        "price_low": "REAL",
+        "volume": "INTEGER",
+        "avg_volume": "INTEGER",
+    }
+
+    def __init__(self, symbol=None, date=None):
+        BaseDataPacket.__init__(self)
+        self._values["symbol"] = symbol
+        self._values["date"] = date
+        for k in DailyStockQuote.fields:
+            if k not in self._values.keys():
+                self._values[k] = 0
+
+
+class DailyOptionQuote(BaseDataPacket):
+    name = "daily_option_quote"
+    fields = {
+        "symbol": "TEXT",
+        "date": "INTEGER",
+        "exp_date": "INTEGER",
+        "option_type": "TEXT",
+        "strike_price": "REAL",
+        "option_interest": "INTEGER",
+        "option_price": "REAL",
+        "contract_volume": "INTEGER",
+    }
+
+    def __init__(
+        self, symbol=None, date=None,
+        exp_date=None, option_type=None, strike_price=None
+    ):
+        BaseDataPacket.__init__(self)
+        self._values["symbol"] = symbol
+        self._values["date"] = date
+        self._values["exp_date"] = exp_date
+        self._values["option_type"] = option_type
+        self._values["strike_price"] = strike_price
+        for k in DailyOptionQuote.fields:
+            if k not in self._values.keys():
+                self._values[k] = 0
+
+
 class DailyOptionInfo(BaseDataPacket):
     name = "daily_option_info"
     fields = {
