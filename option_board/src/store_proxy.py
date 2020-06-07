@@ -27,10 +27,12 @@ def add_to_symbol_table(db: DBMS, symbol: str):
 
 
 def write_option_activity(db: DBMS, option_activity: OptionActivity):
+    # TODO: de-duplicate
     db.write_row(OptionActivity.name, option_activity)
 
 
 def write_daily_option_volume(db: DBMS, option_info: DailyOptionInfo):
+    # TODO: de-duplicate
     db.write_row(DailyOptionInfo.name, option_info)
 
 

@@ -83,7 +83,7 @@ def read_daily_option_info(
 
 def parse_daily_option_quote(
     option_quote: DailyOptionQuote, web_data: List[str],
-    symbol: str, exp_date: int, option_type: str, strike_price:float,
+    symbol: str, option_type: str, strike_price:float, exp_date: int,
     use_barchart: bool=False,
 ):
     if use_barchart:
@@ -104,11 +104,11 @@ def parse_daily_option_quote(
 
 def read_daily_option_quote(
     browser: ChromeDriver,
-    symbol: str, exp_date: int, option_type: str, strike_price:float,
+    symbol: str, option_type: str, strike_price:float, exp_date: int,
     use_barchart: bool=False, suppress_log: bool=False,
 )-> DailyOptionQuote:
     option_quote = DailyOptionQuote(
-        symbol, int(get_date_str()), exp_date, option_type, strike_price)
+        symbol, option_type, strike_price, exp_date, int(get_date_str()))
     if use_barchart:
         url = "https://www.barchart.com/stocks/quotes/"
         url += f"{symbol}/options?expiration={str(exp_date)}&moneyness=allRows"
@@ -135,7 +135,7 @@ def read_daily_option_quote(
         )
         parse_daily_option_quote(
             option_quote, web_data.splitlines(),
-            symbol, exp_date, option_type, strike_price, use_barchart)
+            symbol, option_type, strike_price, exp_date, use_barchart)
     return option_quote
 
 
@@ -144,7 +144,8 @@ if __name__ == '__main__':
     logger.setLevel(logging.DEBUG)
     with ChromeDriver() as browser:
         option_quote = read_daily_option_quote(
-            browser, "ASHR", 20220121, "Call", 30)
+            browser, "ASHR", "Call", 30, 20220121)
         print(json.dumps(option_quote.__dict__, indent=4))
+        exit(0)
         option_info = read_daily_option_info(browser, 'ASHR')
         print(json.dumps(option_info.__dict__, indent=4))

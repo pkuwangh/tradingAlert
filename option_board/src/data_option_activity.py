@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 
 import os
-import sys
 import logging
 
 from data_packet import BaseDataPacket
-from utils_datetime import get_time_log, get_date_str, get_date
-from utils_file import openw
+from utils_datetime import get_date_str, get_date
 from utils_logging import setup_metadata_dir, setup_logger
 from web_chrome_driver import ChromeDriver
 from web_option_activity import read_option_activity

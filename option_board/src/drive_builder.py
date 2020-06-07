@@ -64,7 +64,7 @@ def persist_info(
             num_workers -= 1
             continue
         info_list.append(daily_option_info)
-    logger.info(f"Daily option info retrieved today:")
+    logger.info(f"Daily option info retrieved today: {len(info_list)}")
     _ = [write_daily_option_volume(db, info) for info in info_list]
 
 

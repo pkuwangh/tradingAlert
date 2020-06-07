@@ -56,25 +56,25 @@ class DailyOptionQuote(BaseDataPacket):
     name = "daily_option_quote"
     fields = {
         "symbol": "TEXT",
-        "date": "INTEGER",
-        "exp_date": "INTEGER",
         "option_type": "TEXT",
         "strike_price": "REAL",
+        "exp_date": "INTEGER",
+        "date": "INTEGER",
         "option_interest": "INTEGER",
         "option_price": "REAL",
         "contract_volume": "INTEGER",
     }
 
     def __init__(
-        self, symbol=None, date=None,
-        exp_date=None, option_type=None, strike_price=None
+        self, symbol=None, option_type=None, strike_price=None, exp_date=None,
+        date=None,
     ):
         BaseDataPacket.__init__(self)
         self._values["symbol"] = symbol
-        self._values["date"] = date
-        self._values["exp_date"] = exp_date
         self._values["option_type"] = option_type
         self._values["strike_price"] = strike_price
+        self._values["exp_date"] = exp_date
+        self._values["date"] = date
         for k in DailyOptionQuote.fields:
             if k not in self._values.keys():
                 self._values[k] = 0

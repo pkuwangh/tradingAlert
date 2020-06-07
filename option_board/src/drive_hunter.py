@@ -145,7 +145,7 @@ def evaluate_option_activity(
     logger.info(f"OA evaluation worker-{pname} processed {num_items} items")
 
 
-def process_option_activity(
+def process_unusual_option_activity(
     in_queue: mp.Queue,
     cache_queue: mp.Queue,
     num_workers: int,
@@ -229,7 +229,7 @@ def hunt(
         _ = [x.put(None) for x in raw_oa_queues]
         _ = [p.join() for p in worker_procs]
         logger.info("Hunting done !!!")
-        return process_option_activity(
+        return process_unusual_option_activity(
             filtered_oa_queue, info_cache_queue, len(raw_oa_queues), db)
     return {}
 
