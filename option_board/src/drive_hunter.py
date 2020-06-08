@@ -12,7 +12,7 @@ from store_proxy import (
     get_db_file,
     add_to_symbol_table,
     write_option_activity,
-    read_avg_option_info,
+    query_avg_option_info,
 )
 from utils_datetime import get_time_log
 from utils_file import openw
@@ -180,7 +180,7 @@ def process_unusual_option_activity(
     return aggregated_cache
 
 
-def hunt(
+def hunt_option_activity(
     max_oa: int=0,
     option_activity_file: str=None,
 ) -> typing.Mapping[str, DailyOptionInfo]:
@@ -217,7 +217,7 @@ def hunt(
             option_activity.from_activity_str(line)
             # lookup volume info
             symbol = option_activity.get('symbol')
-            avg_option_info = read_avg_option_info(db, symbol)
+            avg_option_info = query_avg_option_info(db, symbol)
             if avg_option_info.get("count") == 0:
                 # add to tracking list
                 add_to_symbol_table(db, symbol)
@@ -239,6 +239,6 @@ if __name__ == '__main__':
     setup_logger(__file__)
     logger.setLevel(logging.DEBUG)
     #logging.getLogger('store_dbms').setLevel(logging.DEBUG)
-    #hunt(os.path.join(metadata_dir, "OA_200405_012638.txt.gz"))
-    cache = hunt(max_oa=4)
+    #hunt_option_activity(os.path.join(metadata_dir, "OA_200405_012638.txt.gz"))
+    cache = hunt_option_activity(max_oa=4)
     print(len(cache))

@@ -32,7 +32,7 @@ def parse_stock_quote(stock_quote: DailyStockQuote, web_data: List[str]):
                     value = float(value_str[:-1]) * 1e3
                 else:
                     value = float(value_str)
-                stock_quote.set("market_cap", value)
+                stock_quote.set("market_cap", value / 1e9)
             except:
                 status_bad = True
         elif "Range" in line and "Day" in line:

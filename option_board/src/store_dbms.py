@@ -7,6 +7,7 @@ import sqlite3
 import sys
 
 from data_option_activity import OptionActivity
+from data_option_effect import OptionEffect
 from data_packet import LiveSymbol, DailyOptionInfo
 from utils_datetime import get_time_log
 from utils_logging import get_root_dir, setup_logger, setup_metadata_dir
@@ -67,6 +68,9 @@ class DBMS:
             sqls.append('{} {} ({})'.format(
                 base_sql, DailyOptionInfo.name, sql_schema(DailyOptionInfo.fields)
             ))
+            sqls.append("{} {} ({})".format(
+                base_sql, OptionEffect.name, sql_schema(OptionEffect.fields)
+            ))
             for sql_str in sqls:
                 execute_sql(cursor, sql_str)
 
@@ -81,6 +85,20 @@ class DBMS:
             )
             values = sql_values(data_pkt)
             execute_sql(cursor, sql_str, values)
+
+    def delete_row(self, table_name, data_pkt, unique_keys):
+        with self.conn:
+            cursor = self.conn.cursor()
+            where_terms = []
+            for k in unique_keys:
+                if data_pkt.fields[k] == "TEXT":
+                    where_terms.append(f"{k}='{data_pkt.get(k)}'")
+                else:
+                    where_terms.append(f"{k}={data_pkt.get(k)}")
+            sql_str = "DELETE FROM {} WHERE {}".format(
+                table_name, " AND ".join(where_terms),
+            )
+            execute_sql(cursor, sql_str)
 
     def read_table(self, table_name, keys)-> pandas.DataFrame:
         with self.conn:
@@ -104,6 +122,11 @@ if __name__ == '__main__':
     with DBMS(db_file) as db:
         with ChromeDriver() as browser:
             option_info = read_daily_option_info(browser, 'ASHR')
+            db.delete_row(
+                DailyOptionInfo.name,
+                option_info,
+                ["symbol", "date"]
+            )
             db.write_row(DailyOptionInfo.name, option_info)
         x = db.read_table(DailyOptionInfo.name, DailyOptionInfo.fields.keys())
         print(x)

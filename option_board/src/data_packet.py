@@ -36,7 +36,7 @@ class DailyStockQuote(BaseDataPacket):
     fields = {
         "symbol": "TEXT",
         "date": "INTEGER",
-        "market_cap": "INTEGER",
+        "market_cap": "REAL",
         "price_high": "REAL",
         "price_low": "REAL",
         "volume": "INTEGER",

@@ -8,6 +8,7 @@ from collections import namedtuple
 from typing import List
 
 from data_option_activity import OptionActivity
+from data_option_effect import OptionEffect
 from data_packet import LiveSymbol, DailyOptionInfo, AvgOptionInfo
 from store_dbms import DBMS, execute_sql
 from utils_datetime import get_time_log, get_date_str
@@ -27,16 +28,30 @@ def add_to_symbol_table(db: DBMS, symbol: str):
 
 
 def write_option_activity(db: DBMS, option_activity: OptionActivity):
-    # TODO: de-duplicate
+    db.delete_row(
+        OptionActivity.name, option_activity,
+        ["symbol", "option_type", "strike_price", "exp_date"],
+    )
     db.write_row(OptionActivity.name, option_activity)
 
 
+def write_option_effect(db: DBMS, option_effect: OptionEffect):
+    db.delete_row(
+        OptionEffect.name, option_effect,
+        ["symbol", "option_type", "strike_price", "exp_date", "date"],
+    )
+    db.write_row(OptionEffect.name, option_effect)
+
+
 def write_daily_option_volume(db: DBMS, option_info: DailyOptionInfo):
-    # TODO: de-duplicate
+    db.delete_row(
+        DailyOptionInfo.name, option_info,
+        ["symbol", "date"],
+    )
     db.write_row(DailyOptionInfo.name, option_info)
 
 
-def read_avg_option_info(db: DBMS, symbol: str)-> AvgOptionInfo:
+def query_avg_option_info(db: DBMS, symbol: str)-> AvgOptionInfo:
     with db.get_conn() as conn:
         cursor = conn.cursor()
         fields = [
@@ -51,7 +66,7 @@ def read_avg_option_info(db: DBMS, symbol: str)-> AvgOptionInfo:
         return AvgOptionInfo(raw_data)
 
 
-def read_option_activity(db: DBMS, exp_date: int)-> List[OptionActivity]:
+def query_option_activity(db: DBMS, exp_date: int)-> List[OptionActivity]:
     with db.get_conn() as conn:
         cursor = conn.cursor()
         fields = list(OptionActivity.fields.keys())
@@ -109,13 +124,13 @@ if __name__ == '__main__':
     logging.getLogger('store_dbms').setLevel(logging.DEBUG)
     db_file = os.path.join(root_dir, 'database.sqlite3')
     with DBMS(db_file) as db:
-        print(read_avg_option_info(db, 'ASHR'))
-        print(read_avg_option_info(db, 'CO'))
+        print(query_avg_option_info(db, 'ASHR'))
+        print(query_avg_option_info(db, 'CO'))
         cleanup_daily_option_info(db)
         x = db.read_table(DailyOptionInfo.name, DailyOptionInfo.fields.keys())
-        print(x)
-        for x in read_option_activity(db, get_date_str()):
+        print(x.tail(4))
+        for x in query_option_activity(db, get_date_str()):
             print(x.get_display_str())
         x = db.read_table(LiveSymbol.name, LiveSymbol.fields.keys())
-        print(x)
+        print(x.tail(4))
         print(list(x["symbol"])[0:4])

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import json
 import logging
 import multiprocessing as mp
 
@@ -34,7 +35,7 @@ def read_info(
                 logger.warning(f"Unexpected expcetion: {str(e)}")
                 break
             if symbol is None:
-                symbol_queue.put(None, block=True)
+                symbol_queue.put(None, block=True, timeout=60)
                 break
             num_items += 1
             daily_option_info = read_daily_option_info(
@@ -49,7 +50,6 @@ def read_info(
 def persist_info(
     info_queue: mp.Queue,
     num_workers: int,
-    db: DBMS,
 ):
     pname = mp.current_process().name
     logger.info(f"Info writer-{pname} starting")
@@ -65,7 +65,9 @@ def persist_info(
             continue
         info_list.append(daily_option_info)
     logger.info(f"Daily option info retrieved today: {len(info_list)}")
-    _ = [write_daily_option_volume(db, info) for info in info_list]
+    _ = [print(json.dumps(info.__dict__)) for info in info_list]
+    with DBMS(get_db_file()) as db:
+        _ = [write_daily_option_volume(db, info) for info in info_list]
 
 
 def build_history(max_symbols: int=0)-> None:
@@ -82,23 +84,23 @@ def build_history(max_symbols: int=0)-> None:
         name=f"ProcWorker{idx}",
     ) for idx in range(num_workers)]
     _ = [p.start() for p in worker_procs]
-    # get live-symbol list and enqueue for lookup
+    # launch writer
+    writer_proc = mp.Process(
+        target=persist_info,
+        args=(info_queue, num_workers,),
+        name=f"ProcWriter",
+    )
+    writer_proc.start()
+    # get live-symbol list
     with DBMS(get_db_file()) as db:
-        # launch writer
-        writer_proc = mp.Process(
-            target=persist_info,
-            args=(info_queue, num_workers, db,),
-            name=f"ProcWriter",
-        )
-        writer_proc.start()
-        # enqueue candidate
         live_symbols = db.read_table(LiveSymbol.name, LiveSymbol.fields.keys())
-        num_symbols = max_symbols if max_symbols > 0 else len(live_symbols)
-        for x in list(live_symbols["symbol"])[0:num_symbols]:
-            if is_in_black_list(x):
-                continue
-            symbol_queue.put(x, block=True)
-    symbol_queue.put(None, block=True)
+    # enqueue candidate
+    num_symbols = max_symbols if max_symbols > 0 else len(live_symbols)
+    for x in list(live_symbols["symbol"])[0:num_symbols]:
+        if is_in_black_list(x):
+            continue
+        symbol_queue.put(x, block=True, timeout=1200)
+    symbol_queue.put(None, block=True, timeout=1200)
     _ = [p.join() for p in worker_procs]
     writer_proc.join()
     logger.info(f"Option history builder done.")

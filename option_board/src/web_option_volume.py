@@ -87,7 +87,23 @@ def parse_daily_option_quote(
     use_barchart: bool=False,
 ):
     if use_barchart:
-        pass
+        strike_price_str = f"{strike_price:.2f}"
+        started = False
+        for idx, line in enumerate(web_data):
+            if (
+                started and
+                line.startswith(strike_price_str) and
+                ('/' in web_data[idx - 1] or "Strike" in web_data[idx - 1])
+            ):
+                option_quote.set(
+                    "option_interest", convert_int(web_data[idx + 10]))
+                option_quote.set(
+                    "option_price", convert_float(web_data[idx + 1]))
+                option_quote.set(
+                    "contract_volume", convert_int(web_data[idx + 9]))
+                break
+            if line.startswith(option_type):
+                started = True
     else:
         exp_date_str = str(exp_date)[-6:]
         strike_str = "%08d" % (strike_price * 1000)
@@ -112,16 +128,13 @@ def read_daily_option_quote(
     if use_barchart:
         url = "https://www.barchart.com/stocks/quotes/"
         url += f"{symbol}/options?expiration={str(exp_date)}&moneyness=allRows"
-        eclass = "bc-table-scrollable-inner"
+        eclass = "bc-options-quotes"
         web_data = browser.download_data(
             url=url,
             wait_base=2,
             element_class=eclass,
             suppress_log=suppress_log,
         )
-        logger.info(f"barchart data:\n{web_data}")
-        logger.error("other data sources not implemented")
-        raise ValueError(f"use_barchart={use_barchart}")
     else:
         datetime_diff = get_date(str(exp_date)) - get_datetime_start()
         date_url = int(datetime_diff.total_seconds())
@@ -133,9 +146,9 @@ def read_daily_option_quote(
             element_id=eid,
             suppress_log=suppress_log,
         )
-        parse_daily_option_quote(
-            option_quote, web_data.splitlines(),
-            symbol, option_type, strike_price, exp_date, use_barchart)
+    parse_daily_option_quote(
+        option_quote, web_data.splitlines(),
+        symbol, option_type, strike_price, exp_date, use_barchart)
     return option_quote
 
 
@@ -144,7 +157,8 @@ if __name__ == '__main__':
     logger.setLevel(logging.DEBUG)
     with ChromeDriver() as browser:
         option_quote = read_daily_option_quote(
-            browser, "ASHR", "Call", 30, 20220121)
+            #browser, "ASHR", "Call", 30, 20220121, use_barchart=True)
+            browser, "VNOM", "Put", 8, 20200619, use_barchart=True)
         print(json.dumps(option_quote.__dict__, indent=4))
         exit(0)
         option_info = read_daily_option_info(browser, 'ASHR')
