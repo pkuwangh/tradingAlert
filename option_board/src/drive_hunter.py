@@ -164,7 +164,7 @@ def process_unusual_option_activity(
         oa_list.append(raw_data)
     # persist
     _ = [write_option_activity(db, oa) for oa in oa_list]
-    logger.info(f"Option activity captured today:")
+    logger.info(f"Option activity captured today: {len(oa_list)}")
     for oa in oa_list:
         logger.info(f"\t{oa.get_display_str()}")
     # return the cache

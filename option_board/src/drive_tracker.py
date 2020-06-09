@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-def track_effect(
+def read_effect(
     oa_queue: mp.Queue,
     effect_queue: mp.Queue,
 ):
@@ -90,7 +90,7 @@ def track_option_effect() -> None:
     for option_activity in option_activity_list:
         oa_queue.put(option_activity, block=True, timeout=600)
     oa_queue.put(None, block=True, timeout=600)
-    track_effect(oa_queue, effect_queue) 
+    read_effect(oa_queue, effect_queue)
     persist_effect(effect_queue, num_workers)
 
 

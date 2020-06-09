@@ -65,7 +65,7 @@ def persist_info(
             continue
         info_list.append(daily_option_info)
     logger.info(f"Daily option info retrieved today: {len(info_list)}")
-    _ = [print(json.dumps(info.__dict__)) for info in info_list]
+    #_ = [print(json.dumps(info.__dict__)) for info in info_list]
     with DBMS(get_db_file()) as db:
         _ = [write_daily_option_volume(db, info) for info in info_list]
 

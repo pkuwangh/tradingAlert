@@ -30,7 +30,7 @@ def add_to_symbol_table(db: DBMS, symbol: str):
 def write_option_activity(db: DBMS, option_activity: OptionActivity):
     db.delete_row(
         OptionActivity.name, option_activity,
-        ["symbol", "option_type", "strike_price", "exp_date"],
+        ["symbol", "option_type", "strike_price", "exp_date", "deal_time"],
     )
     db.write_row(OptionActivity.name, option_activity)
 
