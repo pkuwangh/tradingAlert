@@ -63,7 +63,8 @@ def persist_info(
         if daily_option_info is None:
             num_workers -= 1
             continue
-        info_list.append(daily_option_info)
+        if daily_option_info.is_non_zero():
+            info_list.append(daily_option_info)
     logger.info(f"Daily option info retrieved today: {len(info_list)}")
     #_ = [print(json.dumps(info.__dict__)) for info in info_list]
     with DBMS(get_db_file()) as db:
@@ -74,7 +75,7 @@ def build_history(max_symbols: int=0)-> None:
     logger.info("================================================")
     logger.info(f"{get_time_log()} Let's build history !!!")
     # synchronized queues
-    symbol_queue = mp.Queue(maxsize=100)
+    symbol_queue = mp.Queue(maxsize=1000)
     info_queue = mp.Queue(maxsize=100)
     # launch down-stream workers
     num_workers = 4

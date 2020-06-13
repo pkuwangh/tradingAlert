@@ -107,8 +107,8 @@ class ChromeDriver:
                         time.sleep(wait_base * (random.random() + 1))
                     except Exception as e:
                         logger.warning(
-                            "error {} getting button={} (retry={}/{})".format(
-                                str(e), button, num_retry, retry_timeout,
+                            "error {} getting button={} url={} (retry={}/{})".format(
+                                str(e), button, url, num_retry, retry_timeout,
                             )
                         )
                         all_seq_good = False
@@ -133,8 +133,8 @@ class ChromeDriver:
                     logger.error("Do not know how to find element")
             except Exception as e:
                 logger.warning(
-                    "error {} when getting element (retry={}/{})".format(
-                        str(e), num_retry, retry_timeout,
+                    "error {} when getting element url={} (retry={}/{})".format(
+                        str(e), url, num_retry, retry_timeout,
                     )
                 )
                 time.sleep(5 * num_retry)
@@ -144,8 +144,9 @@ class ChromeDriver:
                 break
             else:
                 logger.warning(
-                    "failed get element={} text={} len(text)={} (retry={}/{})"
+                    "failed get url={} element={} text={} len(text)={} (retry={}/{})"
                     .format(
+                        url,
                         1 if element else 0,
                         1 if element and element.text else 0,
                         len(element.text) if element and element.text else 0,

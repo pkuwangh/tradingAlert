@@ -99,6 +99,16 @@ class DailyOptionInfo(BaseDataPacket):
             if k not in self._values.keys():
                 self._values[k] = 0
 
+    @classmethod
+    def value_fields(cls):
+        return list(cls.fields.keys())[2:]
+
+    def is_non_zero(self):
+        sum = 0
+        for k in DailyOptionInfo.value_fields():
+            sum += self.get(k)
+        return (sum > 0)
+
 
 class AvgOptionInfo(BaseDataPacket):
     name = "AvgOptionInfo"

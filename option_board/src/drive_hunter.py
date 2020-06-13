@@ -196,7 +196,7 @@ def hunt_option_activity(
         with ChromeDriver() as browser:
             option_activity_list = read_option_activity(
                 browser,
-                save_file=False, folder="records/raw_option_activity",
+                save_file=True, folder="records",
             )
     else:
         with openw(option_activity_file, "rt") as fp:

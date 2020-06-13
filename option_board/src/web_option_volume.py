@@ -26,7 +26,10 @@ def read_exp_dates(browser, symbol, use_barchart=True, suppress_log=False):
         url += '{:s}/options'.format(symbol)
         eclass = 'filters'
         web_data = browser.download_data(
-            url=url, element_class=eclass, suppress_log=suppress_log
+            url=url,
+            wait_base=2,
+            element_class=eclass,
+            suppress_log=suppress_log,
         )
         return extract_dates(web_data)
     else:
@@ -160,6 +163,5 @@ if __name__ == '__main__':
             #browser, "ASHR", "Call", 30, 20220121, use_barchart=True)
             browser, "VNOM", "Put", 8, 20200619, use_barchart=True)
         print(json.dumps(option_quote.__dict__, indent=4))
-        exit(0)
-        option_info = read_daily_option_info(browser, 'ASHR')
+        option_info = read_daily_option_info(browser, 'EOG')
         print(json.dumps(option_info.__dict__, indent=4))
