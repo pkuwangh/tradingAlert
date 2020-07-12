@@ -27,7 +27,7 @@ def read_exp_dates(browser, symbol, use_barchart=True, suppress_log=False):
         eclass = 'filters'
         web_data = browser.download_data(
             url=url,
-            wait_base=2,
+            wait_base=1,
             element_class=eclass,
             suppress_log=suppress_log,
         )
@@ -72,7 +72,7 @@ def read_daily_option_info(
             url += f"{symbol}/options?expiration={str(exp_date)}"
             web_data = browser.download_data(
                 url=url,
-                wait_base=2,
+                wait_base=1,
                 pre_element_class=pre_eclass,
                 element_class=eclass,
                 suppress_log=suppress_sub_log,
@@ -134,7 +134,7 @@ def read_daily_option_quote(
         eclass = "bc-options-quotes"
         web_data = browser.download_data(
             url=url,
-            wait_base=2,
+            wait_base=1,
             element_class=eclass,
             suppress_log=suppress_log,
         )
@@ -145,7 +145,7 @@ def read_daily_option_quote(
         eid = 'Col1-1-OptionContracts-Proxy'
         web_data = browser.download_data(
             url=url,
-            wait_base=2,
+            wait_base=1,
             element_id=eid,
             suppress_log=suppress_log,
         )
@@ -160,8 +160,7 @@ if __name__ == '__main__':
     logger.setLevel(logging.DEBUG)
     with ChromeDriver() as browser:
         option_quote = read_daily_option_quote(
-            #browser, "ASHR", "Call", 30, 20220121, use_barchart=True)
-            browser, "VNOM", "Put", 8, 20200619, use_barchart=True)
+            browser, "ASHR", "Call", 30, 20220121, use_barchart=True)
         print(json.dumps(option_quote.__dict__, indent=4))
-        option_info = read_daily_option_info(browser, 'EOG')
+        option_info = read_daily_option_info(browser, 'ASHR')
         print(json.dumps(option_info.__dict__, indent=4))

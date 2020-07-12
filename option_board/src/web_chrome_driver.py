@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import logging
+import math
 import platform
 import os
 import random
@@ -37,6 +38,7 @@ class ChromeDriver:
         self.options.add_experimental_option(
             "excludeSwitches", ["enable-logging"]
         )
+        self.penalty_score = 0
 
     def __enter__(self):
         logger.debug("ChromeDriver entering")
@@ -75,6 +77,9 @@ class ChromeDriver:
         outfile=None,
         suppress_log=False,
     )-> str:
+        if self.penalty_score > 0:
+            self.penalty_score -= 1
+        # downloading begins
         if not suppress_log:
             logger.info(f"{get_time_log()} download data from {url}")
         num_retry = 0
@@ -82,6 +87,9 @@ class ChromeDriver:
         element = None
         while num_retry < retry_timeout:
             num_retry += 1
+            # adaptive wait time tuning
+            wait_adaptive = 4 * math.ceil(self.penalty_score / 10)
+            wait_time = (wait_base + wait_adaptive) * (random.random() + 1)
             # access the url
             try:
                 self.driver.get(url)
@@ -95,8 +103,9 @@ class ChromeDriver:
                     break
                 else:
                     time.sleep(5 * num_retry)
+                    self.penalty_score += 10
                     continue
-            time.sleep(wait_base * (random.random() + 1))
+            time.sleep(wait_time)
             # click a button if needed
             if button_css:
                 all_seq_good = True
@@ -104,7 +113,7 @@ class ChromeDriver:
                     try:
                         self.driver.find_element_by_css_selector(
                             button).click()
-                        time.sleep(wait_base * (random.random() + 1))
+                        time.sleep(wait_time)
                     except Exception as e:
                         logger.warning(
                             "error {} getting button={} url={} (retry={}/{})".format(
@@ -113,6 +122,7 @@ class ChromeDriver:
                         )
                         all_seq_good = False
                         time.sleep(5 * num_retry)
+                        self.penalty_score += 10
                         break
                 if not all_seq_good:
                     continue
@@ -138,6 +148,7 @@ class ChromeDriver:
                     )
                 )
                 time.sleep(5 * num_retry)
+                self.penalty_score += 10
                 continue
             # done if found element
             if element and element.text and len(element.text) > 1:
@@ -154,6 +165,7 @@ class ChromeDriver:
                     )
                 )
                 time.sleep(5 * num_retry)
+                self.penalty_score += 10
                 continue
         # output & return
         if element:

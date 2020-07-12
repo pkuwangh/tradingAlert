@@ -38,11 +38,16 @@ def read_info(
                 symbol_queue.put(None, block=True, timeout=60)
                 break
             num_items += 1
-            daily_option_info = read_daily_option_info(
-                browser, symbol,
-                suppress_all_log=True, suppress_sub_log=True,
-            )
-            info_queue.put(daily_option_info)
+            try:
+                daily_option_info = read_daily_option_info(
+                    browser, symbol,
+                    suppress_all_log=False, suppress_sub_log=True,
+                )
+            except Exception as e:
+                logger.info(f"Encountered exception ({str(e)}) on {symbol}")
+                continue
+            else:
+                info_queue.put(daily_option_info)
     info_queue.put(None)
     logger.info(f"History builder worker-{pname} processed {num_items} items")
 

@@ -55,7 +55,7 @@ def read_option_activity(
         num_retry += 1
         try:
             web_data = browser.download_data(
-                url=url, wait_base=2 * num_retry,
+                url=url, wait_base=num_retry,
                 button_css=buttons, element_id=eid)
         except Exception as e:
             logger.error(f'error {str(e)} (retry={num_retry}/{retry_timeout})')
